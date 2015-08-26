@@ -139,7 +139,7 @@ Namespace Contensive.adminNavigator
                     & cr & "function OpenAdminNav() {SetDisplay('AdminNavHeadOpened','block');SetDisplay('AdminNavHeadClosed','none');SetDisplay('AdminNavContentOpened','block');SetDisplay('AdminNavContentMinWidth','block');SetDisplay('AdminNavContentClosed','none');cj.ajax.setVisitProperty('','AdminNavOpen','1');if(!AdminNavPop){cj.ajax.addon('AdminNavigatorGetNode','','','AdminNavContentOpened');AdminNavPop=true;}else{cj.ajax.addon('AdminNavigatorOpenNode');}}" _
                     & cr & ""
             End If
-            Callcp.Doc.AddHeadJavascript(AdminNavJS, "Admin Navigator")
+            Call cp.Doc.AddHeadJavascript(AdminNavJS)
             '
             '
             '

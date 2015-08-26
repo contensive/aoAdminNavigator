@@ -286,7 +286,7 @@ Namespace Contensive.adminNavigator
 
             kmaEncodeInteger = 0
             If IsNumeric(test) Then
-                kmaEncodeInteger = CInt(kmaEncodeInteger)
+                kmaEncodeInteger = CInt(test)
             End If
             '
             Exit Function

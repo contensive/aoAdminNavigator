@@ -155,7 +155,7 @@ Namespace Contensive.adminNavigator
                         End If
                     Loop
                     store.ArrayPointer = store.ArrayPointer + 1
-                    returnKey = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    returnKey = kmaEncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
             Catch ex As Exception
                 Throw New indexException("GetPointer error", ex)
@@ -204,7 +204,7 @@ Namespace Contensive.adminNavigator
                     store.ArrayPointer = store.ArrayPointer + 1
                     UcaseKey = UCase(Key)
                     If (store.UcaseKeyArray(store.ArrayPointer) = UcaseKey) Then
-                        nextPointerMatch = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                        nextPointerMatch = kmaEncodeInteger(store.PointerArray(store.ArrayPointer))
                     Else
                         store.ArrayPointer = store.ArrayPointer - 1
                     End If
@@ -230,7 +230,7 @@ Namespace Contensive.adminNavigator
                 ' GetFirstPointer = -1
                 If store.ArrayCount > 0 Then
                     store.ArrayPointer = 0
-                    firstPointer = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    firstPointer = kmaEncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
                 '
             Catch ex As Exception
@@ -254,7 +254,7 @@ Namespace Contensive.adminNavigator
                 'nextPointer = -1
                 If (store.ArrayPointer + 1) < store.ArrayCount Then
                     store.ArrayPointer = store.ArrayPointer + 1
-                    nextPointer = EncodeInteger(store.PointerArray(store.ArrayPointer))
+                    nextPointer = kmaEncodeInteger(store.PointerArray(store.ArrayPointer))
                 End If
             Catch ex As Exception
                 Throw New indexException("GetPointer error", ex)

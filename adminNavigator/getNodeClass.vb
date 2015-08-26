@@ -1,3 +1,6 @@
+Option Explicit On
+Option Strict On
+
 Imports System
 Imports System.Collections.Generic
 Imports System.Text
@@ -21,20 +24,20 @@ Namespace Contensive.adminNavigator
         '=====================================================================================
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String
+            Dim returnHtml As String = ""
             Try
                 Dim ParentNode As String
                 Dim OpenNodeList As String
-                Dim NavigatorJS As String
+                Dim NavigatorJS As String = ""
                 '
                 '
                 ' For Page Addons, return the result
                 '
                 OpenNodeList = CP.Visit.GetText("AdminNavOpenNodeList")
-                ParentNode = cp.doc.getText("nodeid")
+                ParentNode = CP.Doc.GetText("nodeid")
                 If ParentNode <> "" Then
                     OpenNodeList = OpenNodeList & "," & ParentNode
-                    Call cp.visit.setProperty("AdminNavOpenNodeList", OpenNodeList)
+                    Call CP.Visit.SetProperty("AdminNavOpenNodeList", OpenNodeList)
                 End If
                 returnHtml = GetNavigator(CP, ParentNode, OpenNodeList, NavigatorJS)
                 If NavigatorJS <> "" Then
@@ -45,7 +48,7 @@ Namespace Contensive.adminNavigator
                     Call CP.Doc.AddHeadJavascript(NavigatorJS)
                 End If
             Catch ex As Exception
-                errorReport(CP, ex, "execute")
+                HandleError(CP, ex)
             End Try
             Return returnHtml
         End Function
@@ -53,1036 +56,1023 @@ Namespace Contensive.adminNavigator
         '
         '
         Friend Function GetNavigator(cp As CPBaseClass, ParentNode As String, OpenNodeList As String, ByRef Return_NavigatorJS As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Const AutoManageAddons = True
-            '
-            Dim NodeNavigatorJS As String
-            Dim ATag As String
-            Dim Index As New keyPtrIndexClass
-            Dim SortNodes() As SortNodeType
-            Dim SortPtr As Integer
-            Dim SortCnt As Integer
-            Dim test As String
-            Dim NameSuffix As String
-            Dim NodeID As Integer
-            Dim CSAddon As Integer
-            Dim SettingPageID As Integer
-            Dim FieldList As String
-            Dim IsVisible As Boolean
-            Dim BakeName As String
-            '
-            ' ----- Timer Trace
-            Dim TimerTraceMarker As String
-            Dim StartTickCount As Integer
-            'StartTickCount = GetTickCount
-            'TimerTraceMarker = Main.GetRandomLong
-            'Main.ToolsPanelTimerTrace = Main.ToolsPanelTimerTrace & CR & "<li class=""ccAdminSmall ccPanel"">AdminClass.GetNavigator(): " & TimerTraceMarker & " msec</li>" & CR & "<ul>"
-            ' ----- /Timer Trace
-            '
-            Dim NodeIDString As String
-            Dim IconNoSubNodes As String
-            Dim IconOpened As String
-            Dim IconClosed As String
-            Dim NavigatorID As Integer
-            'Dim DivIDBase As String
-            Dim SQL As String
-            Dim CollectionID As Integer
-            Dim DivIDClosed As String
-            Dim DivIDOpened As String
-            Dim DivIDContent As String
-            Dim DivIDEmpty As String
-            Dim NodeSN As String
-            Dim CS As Integer
-            Dim s As String
-            Dim EntryID As Integer
-            Dim Name As String
-            Dim Caption As String
-            Dim SubNav As String
-            Dim NewWindow As Boolean
-            Dim ContentID As Integer
-            Dim HelpAddonID As Integer
-            Dim helpCollectionID As Integer
-            Dim addonid As Integer
-            Dim Link As String
-            Dim Criteria As String
-            Dim BlockSubNodes As Boolean
-            Dim TopParentNode As String
-            Dim ParentNodes() As String
-            'Dim NodeIDStringPrefix As String
-            'Dim NodeIDString As String
-            Dim NodeType As NodeTypeEnum
-            Dim ContentName As String
-            Dim ContentTableName As String
-            Dim Ptr As Integer
-            Dim RecordName As String
-            Dim NavIconType As Integer
-            Dim NavIconTitle As String
-            Dim NavIconTitleHtmlEncoded As String
-            Dim EmptyNodeList As String
-            Dim EmptyNodeListInitial As String
-            'Dim RS As Recordset
-            Dim EmptyNodes() As Integer
-            Dim Temp As Object
-            Dim LegacyMenuControlID As Integer
-            Dim IsLegacyMenuRootNode As Boolean
-            Dim ContentControlID As Integer
-            Dim BuildVersion As String
-            Dim isDeveloper As Boolean
-            Dim cs2 As CPCSBaseClass = cp.CSNew()
-            Dim csChildList As CPCSBaseClass = cp.CSNew()
-            '
-            BuildVersion = cp.Site.GetProperty("buildversion")
-            isDeveloper = cp.User.IsDeveloper()
-            If BuildVersion < "3.4.175" Then
-                GetNavigator = "Upgrade your site Database to support this feature."
-            Else
-                If isDeveloper Then
-                    BakeName = "AdminNav EmptyNodeList Dev"
-                ElseIf cp.user.isAdmin() Then
-                    BakeName = "AdminNav EmptyNodeList Admin"
+            Dim returnNav As String = ""
+            Try
+                Const AutoManageAddons = True
+                '
+                Dim NodeNavigatorJS As String
+                Dim ATag As String
+                Dim Index As New keyPtrIndexClass
+                'Dim SortNodes() As SortNodeType
+                'Dim SortPtr As Integer
+                'Dim SortCnt As Integer
+                'Dim test As String
+                Dim NameSuffix As String
+                'Dim NodeID As Integer
+                'Dim CSAddon As Integer
+                Dim SettingPageID As Integer
+                Dim FieldList As String
+                'Dim IsVisible As Boolean
+                Dim BakeName As String
+                '
+                ' ----- Timer Trace
+                'Dim TimerTraceMarker As String
+                'Dim StartTickCount As Integer
+                'StartTickCount = GetTickCount
+                'TimerTraceMarker = Main.GetRandomLong
+                'Main.ToolsPanelTimerTrace = Main.ToolsPanelTimerTrace & CR & "<li class=""ccAdminSmall ccPanel"">AdminClass.GetNavigator(): " & TimerTraceMarker & " msec</li>" & CR & "<ul>"
+                ' ----- /Timer Trace
+                '
+                Dim NodeIDString As String
+                Dim IconNoSubNodes As String
+                'Dim IconOpened As String
+                Dim IconClosed As String
+                Dim NavigatorID As Integer
+                'Dim DivIDBase As String
+                Dim SQL As String
+                Dim CollectionID As Integer
+                'Dim DivIDClosed As String
+                'Dim DivIDOpened As String
+                'Dim DivIDContent As String
+                'Dim DivIDEmpty As String
+                'Dim NodeSN As String
+                Dim CS As Integer
+                Dim s As String
+                'Dim EntryID As Integer
+                Dim Name As String
+                'Dim Caption As String
+                'Dim SubNav As String
+                Dim NewWindow As Boolean
+                Dim ContentID As Integer
+                Dim HelpAddonID As Integer
+                Dim helpCollectionID As Integer
+                Dim addonid As Integer
+                Dim Link As String
+                Dim Criteria As String
+                Dim BlockSubNodes As Boolean
+                Dim TopParentNode As String
+                Dim ParentNodes() As String
+                'Dim NodeIDStringPrefix As String
+                'Dim NodeIDString As String
+                Dim NodeType As NodeTypeEnum
+                Dim ContentName As String
+                'Dim ContentTableName As String
+                Dim Ptr As Integer
+                Dim RecordName As String
+                Dim NavIconType As Integer
+                Dim NavIconTitle As String
+                Dim NavIconTitleHtmlEncoded As String
+                Dim EmptyNodeList As String
+                Dim EmptyNodeListInitial As String
+                'Dim RS As Recordset
+                'Dim EmptyNodes() As Integer
+                'Dim Temp As Object
+                Dim LegacyMenuControlID As Integer
+                'Dim IsLegacyMenuRootNode As Boolean
+                Dim ContentControlID As Integer
+                Dim BuildVersion As String
+                Dim isDeveloper As Boolean
+                Dim cs2 As CPCSBaseClass = cp.CSNew()
+                Dim csChildList As CPCSBaseClass = cp.CSNew()
+                '
+                BuildVersion = cp.Site.GetProperty("buildversion")
+                isDeveloper = cp.User.IsDeveloper()
+                If BuildVersion < "3.4.175" Then
+                    returnNav = "Upgrade your site Database to support this feature."
                 Else
-                    BakeName = "AdminNav EmptyNodeList CM" & cp.user.id
-                End If
-                EmptyNodeList = cp.Cache.Read(BakeName)
-                If EmptyNodeList = "" Then
-                    SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
-                    If cs2.OpenSQL(SQL) Then
-                        Do
-                            EmptyNodeList &= cs2.GetText("id")
-                            Call cs2.GoNext()
-                        Loop While cs2.OK()
+                    If isDeveloper Then
+                        BakeName = "AdminNav EmptyNodeList Dev"
+                    ElseIf cp.User.IsAdmin() Then
+                        BakeName = "AdminNav EmptyNodeList Admin"
+                    Else
+                        BakeName = "AdminNav EmptyNodeList CM" & cp.User.Id
                     End If
-                    Call cs2.Close()
-                    ''SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null And n.ContentControlID=" & cp.Content.GetID("Navigator Entries") & " group by n.id"
-                    'RS = Main.executesql("default", SQL)
-                    'If Not (RS Is Nothing) Then
-                    '    If Not RS.EOF Then
-                    '        EmptyNodeList = RS.GetString(adClipString, , "", ",")
-                    '        'EmptyNodeList = Join(temp(0), ",")
-                    '    End If
-                    'End If
-                    'RS = Nothing
-                    Call cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries")
-                End If
-                EmptyNodeListInitial = EmptyNodeList
-                TopParentNode = ParentNode
-                If TopParentNode = "" Then
-                    '
-                    ' bad call
-                    '
-                    ReDim ParentNodes(0)
-                    ParentNodes(0) = ""
-                Else
-                    '
-                    ' load ParentNodes with argument
-                    '
-                    ParentNodes = Split(TopParentNode, ".")
-                End If
-                LegacyMenuControlID = cp.Content.GetID("Menu Entries")
-                Select Case ParentNodes(0)
-                    '
-                    ' Open CS so:
-                    '   Name = the caption that is displayed for the entry
-                    '   ID (NavigatorID) = the NavigatorEntry the record represents
-                    '       if the node has no navigation entry, NavigatorID=0 if there are no child nodes
-                    '       this number is used for the open/close javascript, as well as stored to remember open/close state
-                    '       during future hits, as the menu is built, this is checked in the open/close list for a match
-                    '       NavigatorID=0 will only work if the node has not child nodes
-                    '   AddonID = the ID of the addon that should be run if this entry is selected, 0 otherwise
-                    '   CollectionID, if this is the manage add-ons section, this is the collection node
-                    '   NewWindow = 0 or 1, if the link opens in new window
-                    '   ContentID = the id of the content to be opened in list mode if the entry is clicked
-                    '   Link = URL to link the menu entry
-                    '   NodeIDString = unique string that represents this node
-                    '       Navigator Entries - 'n'+EntryID
-                    '       Collections = 'c'+CollectionID
-                    '       Add-ons = 'a'+AddonID
-                    '       CDefs = 'd'+ContentID
-                    '
-                    Case NodeIDManageAddons
-                        '
-                        ' Special Case: clicked on Manage Add-ons ("manageaddons")
-                        ' Link to Add-on Manager
-                        '
-                        NodeIDString = ""
-                        addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager")
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "?addonguid=" & AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-on Manager", AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        ' List Collections
-                        '
-                        FieldList = "Name,0 as id,ccaddoncollections.id as collectionid,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
-                        'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
-                        Criteria = "((system=0)or(system is null))"
-                        If (BuildVersion >= "4.1.512") And (Not isDeveloper) Then
-                            Criteria = Criteria & "and((blockNavigatorNode=0)or(blockNavigatorNode is null))"
-                        End If
-                        Dim cs3 As CPCSBaseClass = cp.CSNew()
-                        NodeType = NodeTypeEnum.NodeTypeCollection
-                        BlockSubNodes = False
-                        If cs3.Open("", Criteria, , , FieldList) Then
+                    EmptyNodeList = cp.Cache.Read(BakeName)
+                    If EmptyNodeList = "" Then
+                        SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
+                        If cs2.OpenSQL(SQL) Then
                             Do
-                                Name = Trim(cs3.GetText("name"))
-                                NavIconTitle = Name
-                                CollectionID = cs3.GetInteger("collectionid")
-                                NodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
-                                NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                                s = s & GetNavigatorNode(cp, CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeCollection, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                                Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                Call cs3.GoNext()
-                            Loop While cs3.OK()
+                                EmptyNodeList &= "," & cs2.GetText("id")
+                                Call cs2.GoNext()
+                            Loop While cs2.OK()
+                            EmptyNodeList = EmptyNodeList.Substring(1)
                         End If
-                        Call cs3.Close()
-                        'CS = Main.openCSContent("Add-on Collections", Criteria, , , , , FieldList)
-                        'NodeType = NodeTypeCollection
-                        'BlockSubNodes = False
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText( "name"))
-                        '    NavIconTitle = Name
-                        '    CollectionID = csx.getInteger( "collectionid")
-                        '    NodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
-                        '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                        '    s = s & GetNavigatorNode(cp,CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeCollection, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
-                        '
-                        ' Advanced folder to contain edit links to create addons and collections
-                        '
-                        NodeIDString = NodeIDManageAddonsAdvanced
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, "Advanced", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeFolder, "Add-ons With No Collection", AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                    Case NodeIDManageAddonsCollectionPrefix
-                        '
-                        ' Special Case: clicked on Manage Add-ons.collection
-                        ' ParentNode(1) is the id of the collection they clicked on
-                        ' List all add-ons
-                        ' List all CDef
-                        ' Add Collection Help
-                        '
-                        CollectionID = 0
-                        If UBound(ParentNodes) > 0 Then
-                            CollectionID = cp.Utils.EncodeInteger(ParentNodes(1))
-                        End If
-                        '
-                        ' Help Icon
-                        '
-                        Name = "Help"
-                        NodeIDString = ""
-                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                        s = s & GetNavigatorNode(cp, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        ' List out add-ons in this collection
-                        '
-                        NodeIDString = ""
-                        FieldList = "*"
-                        'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
-                        Criteria = "(collectionid=" & CollectionID & ")"
-                        If Not isDeveloper Then
-                            Criteria = Criteria & "and(admin<>0)"
-                            'Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
-                        End If
-                        Dim cs4 As CPCSBaseClass = cp.CSNew()
-                        If cs4.Open("add-ons", Criteria, , , FieldList) Then
-                            Do
-                                Name = Trim(cs4.GetText("name"))
-                                NameSuffix = ""
-                                If isDeveloper Then
-                                    If cs4.GetBoolean("content") Then
-                                        NameSuffix = NameSuffix & "c"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("template") Then
-                                        NameSuffix = NameSuffix & "t"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    'Name = Name & "(" & NameSuffix & ")"
-                                    If cs4.GetBoolean("email") Then
-                                        NameSuffix = NameSuffix & "m"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("admin") Then
-                                        NameSuffix = NameSuffix & "n"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("remotemethod") Then
-                                        NameSuffix = NameSuffix & "r"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("onpagestartevent") Then
-                                        NameSuffix = NameSuffix & "b"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("onpageendevent") Then
-                                        NameSuffix = NameSuffix & "a"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("onbodystart") Then
-                                        NameSuffix = NameSuffix & "s"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    If cs4.GetBoolean("onpageendevent") Then
-                                        NameSuffix = NameSuffix & "e"
-                                    Else
-                                        NameSuffix = NameSuffix & "-"
-                                    End If
-                                    Name = Name & " (" & NameSuffix & ")"
-                                End If
-                                addonid = cs4.GetInteger("ID")
-                                NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                                ContentControlID = cs4.GetInteger("ContentControlID")
-                                Select Case cs4.GetInteger("navtypeid")
-                                    Case 2
-                                        NavIconType = NavIconTypeReport
-                                    Case 3
-                                        NavIconType = NavIconTypeSetting
-                                    Case 4
-                                        NavIconType = NavIconTypeTool
-                                    Case Else
-                                        NavIconType = NavIconTypeAddon
-                                End Select
-                                s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                                Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                Call cs4.GoNext()
-                            Loop While cs4.OK
-                        End If
-                        Call cs4.Close()
-
-                        'CS = Main.openCSContent("Add-ons", Criteria, , , , , FieldList)
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText( "name"))
-                        '    NameSuffix = ""
-                        '    If isDeveloper Then
-                        '        If csx.getBoolean( "content") Then
-                        '            NameSuffix = NameSuffix & "c"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "template") Then
-                        '            NameSuffix = NameSuffix & "t"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        'Name = Name & "(" & NameSuffix & ")"
-                        '        If csx.getBoolean( "email") Then
-                        '            NameSuffix = NameSuffix & "m"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "admin") Then
-                        '            NameSuffix = NameSuffix & "n"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "remotemethod") Then
-                        '            NameSuffix = NameSuffix & "r"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "onpagestartevent") Then
-                        '            NameSuffix = NameSuffix & "b"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "onpageendevent") Then
-                        '            NameSuffix = NameSuffix & "a"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "onbodystart") Then
-                        '            NameSuffix = NameSuffix & "s"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        If csx.getBoolean( "onpageendevent") Then
-                        '            NameSuffix = NameSuffix & "e"
-                        '        Else
-                        '            NameSuffix = NameSuffix & "-"
-                        '        End If
-                        '        Name = Name & " (" & NameSuffix & ")"
+                        Call cs2.Close()
+                        ''SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null And n.ContentControlID=" & cp.Content.GetID("Navigator Entries") & " group by n.id"
+                        'RS = Main.executesql("default", SQL)
+                        'If Not (RS Is Nothing) Then
+                        '    If Not RS.EOF Then
+                        '        EmptyNodeList = RS.GetString(adClipString, , "", ",")
+                        '        'EmptyNodeList = Join(temp(0), ",")
                         '    End If
-                        '    addonid = csx.getInteger( "ID")
-                        '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                        '    ContentControlID = csx.getInteger( "ContentControlID")
-                        '    Select Case csx.getInteger( "navtypeid")
-                        '        Case 2
-                        '            NavIconType = NavIconTypeReport
-                        '        Case 3
-                        '            NavIconType = NavIconTypeSetting
-                        '        Case 4
-                        '            NavIconType = NavIconTypeTool
-                        '        Case Else
-                        '            NavIconType = NavIconTypeAddon
-                        '    End Select
-                        '    s = s & GetNavigatorNode(0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
+                        'End If
+                        'RS = Nothing
+                        Call cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries")
+                    End If
+                    EmptyNodeListInitial = EmptyNodeList
+                    TopParentNode = ParentNode
+                    If TopParentNode = "" Then
                         '
-                        ' List out cdefs connected to this collection
+                        ' bad call
                         '
-                        NodeIDString = ""
-                        Criteria = "(collectionid=" & CollectionID & ")"
-                        If isDeveloper Then
-                        ElseIf cp.User.IsAdmin Then
-                            Criteria = Criteria & "and(developeronly=0)"
-                        Else
-                            Criteria = Criteria & "and(developeronly=0)and(adminonly=0)"
-                        End If
-                        Dim LastContentID As Integer
-                        Dim DupsFound As Boolean
-                        LastContentID = -1
-                        DupsFound = False
-                        SQL = "select c.id,c.name,c.contentcontrolid,c.developeronly,c.adminonly from ccContent c left join ccAddonCollectionCDefRules r on r.contentid=c.id where " & Criteria & " order by c.name"
-                        Dim cs7 As CPCSBaseClass = cp.CSNew()
-                        If cs7.OpenSQL(SQL) Then
-                            Do
-                                Name = Trim(cs7.GetText("name"))
-                                ContentID = cs7.GetInteger("id")
-                                If ContentID = LastContentID Then
-                                    DupsFound = True
-                                Else
-                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                                    ContentControlID = cs7.GetInteger("ContentControlID")
+                        ReDim ParentNodes(0)
+                        ParentNodes(0) = ""
+                    Else
+                        '
+                        ' load ParentNodes with argument
+                        '
+                        ParentNodes = Split(TopParentNode, ".")
+                    End If
+                    LegacyMenuControlID = cp.Content.GetID("Menu Entries")
+                    Select Case ParentNodes(0)
+                        '
+                        ' Open CS so:
+                        '   Name = the caption that is displayed for the entry
+                        '   ID (NavigatorID) = the NavigatorEntry the record represents
+                        '       if the node has no navigation entry, NavigatorID=0 if there are no child nodes
+                        '       this number is used for the open/close javascript, as well as stored to remember open/close state
+                        '       during future hits, as the menu is built, this is checked in the open/close list for a match
+                        '       NavigatorID=0 will only work if the node has not child nodes
+                        '   AddonID = the ID of the addon that should be run if this entry is selected, 0 otherwise
+                        '   CollectionID, if this is the manage add-ons section, this is the collection node
+                        '   NewWindow = 0 or 1, if the link opens in new window
+                        '   ContentID = the id of the content to be opened in list mode if the entry is clicked
+                        '   Link = URL to link the menu entry
+                        '   NodeIDString = unique string that represents this node
+                        '       Navigator Entries - 'n'+EntryID
+                        '       Collections = 'c'+CollectionID
+                        '       Add-ons = 'a'+AddonID
+                        '       CDefs = 'd'+ContentID
+                        '
+                        Case NodeIDManageAddons
+                            '
+                            ' Special Case: clicked on Manage Add-ons ("manageaddons")
+                            ' Link to Add-on Manager
+                            '
+                            NodeIDString = ""
+                            addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager")
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "?addonguid=" & AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-on Manager", AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            ' List Collections
+                            '
+                            FieldList = "Name,0 as id,ccaddoncollections.id as collectionid,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
+                            'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
+                            Criteria = "((system=0)or(system is null))"
+                            If (BuildVersion >= "4.1.512") And (Not isDeveloper) Then
+                                Criteria = Criteria & "and((blockNavigatorNode=0)or(blockNavigatorNode is null))"
+                            End If
+                            Dim cs3 As CPCSBaseClass = cp.CSNew()
+                            NodeType = NodeTypeEnum.NodeTypeCollection
+                            BlockSubNodes = False
+                            If cs3.Open("Add-on Collections", Criteria, "name", , FieldList) Then
+                                Do
+                                    Name = Trim(cs3.GetText("name"))
+                                    NavIconTitle = Name
+                                    CollectionID = cs3.GetInteger("collectionid")
+                                    NodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
+                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                                    s = s & GetNavigatorNode(cp, CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeCollection, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                    Call cs3.GoNext()
+                                Loop While cs3.OK()
+                            End If
+                            Call cs3.Close()
+                            'CS = Main.openCSContent("Add-on Collections", Criteria, , , , , FieldList)
+                            'NodeType = NodeTypeCollection
+                            'BlockSubNodes = False
+                            'Do While Main.iscsok(CS)
+                            '    Name = Trim(csx.getText( "name"))
+                            '    NavIconTitle = Name
+                            '    CollectionID = csx.getInteger( "collectionid")
+                            '    NodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
+                            '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                            '    s = s & GetNavigatorNode(cp,CollectionID, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeCollection, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '    Call Main.NextCSRecord(CS)
+                            'Loop
+                            'Call Main.closeCs(CS)
+                            '
+                            ' Advanced folder to contain edit links to create addons and collections
+                            '
+                            NodeIDString = NodeIDManageAddonsAdvanced
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, "Advanced", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeFolder, "Add-ons With No Collection", AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        Case NodeIDManageAddonsCollectionPrefix
+                            '
+                            ' Special Case: clicked on Manage Add-ons.collection
+                            ' ParentNode(1) is the id of the collection they clicked on
+                            ' List all add-ons
+                            ' List all CDef
+                            ' Add Collection Help
+                            '
+                            CollectionID = 0
+                            If UBound(ParentNodes) > 0 Then
+                                CollectionID = cp.Utils.EncodeInteger(ParentNodes(1))
+                            End If
+                            '
+                            ' Help Icon
+                            '
+                            Name = "Help"
+                            NodeIDString = ""
+                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                            s = s & GetNavigatorNode(cp, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            ' List out add-ons in this collection
+                            '
+                            NodeIDString = ""
+                            FieldList = "*"
+                            'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
+                            Criteria = "(collectionid=" & CollectionID & ")"
+                            If Not isDeveloper Then
+                                Criteria = Criteria & "and(admin<>0)"
+                                'Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
+                            End If
+                            Dim cs4 As CPCSBaseClass = cp.CSNew()
+                            If cs4.Open("add-ons", Criteria, "name", , FieldList) Then
+                                Do
+                                    Name = Trim(cs4.GetText("name"))
                                     NameSuffix = ""
                                     If isDeveloper Then
-                                        If cs7.GetBoolean("developeronly") Then
-                                            NameSuffix = NameSuffix & "--"
+                                        If cs4.GetBoolean("content") Then
+                                            NameSuffix = NameSuffix & "c"
                                         Else
-                                            If cs7.GetBoolean("adminonly") Then
-                                                NameSuffix = NameSuffix & "-a"
-                                            Else
-                                                NameSuffix = NameSuffix & "ca"
-                                            End If
+                                            NameSuffix = NameSuffix & "-"
                                         End If
-
+                                        If cs4.GetBoolean("template") Then
+                                            NameSuffix = NameSuffix & "t"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        'Name = Name & "(" & NameSuffix & ")"
+                                        If cs4.GetBoolean("email") Then
+                                            NameSuffix = NameSuffix & "m"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("admin") Then
+                                            NameSuffix = NameSuffix & "n"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("remotemethod") Then
+                                            NameSuffix = NameSuffix & "r"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("onpagestartevent") Then
+                                            NameSuffix = NameSuffix & "b"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("onpageendevent") Then
+                                            NameSuffix = NameSuffix & "a"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("onbodystart") Then
+                                            NameSuffix = NameSuffix & "s"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
+                                        If cs4.GetBoolean("onpageendevent") Then
+                                            NameSuffix = NameSuffix & "e"
+                                        Else
+                                            NameSuffix = NameSuffix & "-"
+                                        End If
                                         Name = Name & " (" & NameSuffix & ")"
                                     End If
-                                    s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                    addonid = cs4.GetInteger("ID")
+                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                    ContentControlID = cs4.GetInteger("ContentControlID")
+                                    Select Case cs4.GetInteger("navtypeid")
+                                        Case 2
+                                            NavIconType = NavIconTypeReport
+                                        Case 3
+                                            NavIconType = NavIconTypeSetting
+                                        Case 4
+                                            NavIconType = NavIconTypeTool
+                                        Case Else
+                                            NavIconType = NavIconTypeAddon
+                                    End Select
+                                    s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
                                     Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                End If
-                                LastContentID = ContentID
-                                Call cs7.GoNext()
-                            Loop While cs7.OK()
-                        End If
-                        Call cs7.Close()
-                        '
-                        'CS = Main.OpenCSSQL("default", SQL)
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText("name"))
-                        '    ContentID = csx.getInteger("id")
-                        '    If ContentID = LastContentID Then
-                        '        DupsFound = True
-                        '    Else
-                        '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                        '        ContentControlID = csx.getInteger("ContentControlID")
-                        '        NameSuffix = ""
-                        '        If isDeveloper Then
-                        '            If csx.getBoolean("developeronly") Then
-                        '                NameSuffix = NameSuffix & "--"
-                        '            Else
-                        '                If csx.getBoolean("adminonly") Then
-                        '                    NameSuffix = NameSuffix & "-a"
-                        '                Else
-                        '                    NameSuffix = NameSuffix & "ca"
-                        '                End If
-                        '            End If
+                                    Call cs4.GoNext()
+                                Loop While cs4.OK
+                            End If
+                            Call cs4.Close()
 
-                        '            Name = Name & " (" & NameSuffix & ")"
-                        '        End If
-                        '        s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        '        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    End If
-                        '    LastContentID = ContentID
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
-                        If DupsFound Then
-                            SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
-                            SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
-                            Call cp.Db.ExecuteSQL(SQL)
-                        End If
-                    Case NodeIDManageAddonsAdvanced
-                        '
-                        ' Special Case: clicked on Manage Add-ons.advanced
-                        '   edit links for Add-ons, Add-on Collections
-                        '
-                        ' Folder to Add-ons without Collections
-                        '
-                        NodeIDString = NodeIDAddonsNoCollection
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, "Add-ons With No Collection", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-ons With No Collection", AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        Name = "Add-ons"
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        Name = "Add-on Collections"
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        Name = "Aggregate Access"
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        Name = "Scripting Modules"
-                        s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                    Case NodeIDAddonsNoCollection
-                        '
-                        ' special case: Add-on List that do not have collections
-                        '
-                        CollectionID = 0
-                        FieldList = "0 as ContentControlID,A.Name as Name,A.ID as ID,A.ID as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeAddon & " as NavIconType,A.Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
+                            'CS = Main.openCSContent("Add-ons", Criteria, , , , , FieldList)
+                            'Do While Main.iscsok(CS)
+                            '    Name = Trim(csx.getText( "name"))
+                            '    NameSuffix = ""
+                            '    If isDeveloper Then
+                            '        If csx.getBoolean( "content") Then
+                            '            NameSuffix = NameSuffix & "c"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "template") Then
+                            '            NameSuffix = NameSuffix & "t"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        'Name = Name & "(" & NameSuffix & ")"
+                            '        If csx.getBoolean( "email") Then
+                            '            NameSuffix = NameSuffix & "m"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "admin") Then
+                            '            NameSuffix = NameSuffix & "n"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "remotemethod") Then
+                            '            NameSuffix = NameSuffix & "r"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "onpagestartevent") Then
+                            '            NameSuffix = NameSuffix & "b"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "onpageendevent") Then
+                            '            NameSuffix = NameSuffix & "a"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "onbodystart") Then
+                            '            NameSuffix = NameSuffix & "s"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        If csx.getBoolean( "onpageendevent") Then
+                            '            NameSuffix = NameSuffix & "e"
+                            '        Else
+                            '            NameSuffix = NameSuffix & "-"
+                            '        End If
+                            '        Name = Name & " (" & NameSuffix & ")"
+                            '    End If
+                            '    addonid = csx.getInteger( "ID")
+                            '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                            '    ContentControlID = csx.getInteger( "ContentControlID")
+                            '    Select Case csx.getInteger( "navtypeid")
+                            '        Case 2
+                            '            NavIconType = NavIconTypeReport
+                            '        Case 3
+                            '            NavIconType = NavIconTypeSetting
+                            '        Case 4
+                            '            NavIconType = NavIconTypeTool
+                            '        Case Else
+                            '            NavIconType = NavIconTypeAddon
+                            '    End Select
+                            '    s = s & GetNavigatorNode(0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '    Call Main.NextCSRecord(CS)
+                            'Loop
+                            'Call Main.closeCs(CS)
+                            '
+                            ' List out cdefs connected to this collection
+                            '
+                            NodeIDString = ""
+                            Criteria = "(collectionid=" & CollectionID & ")"
+                            If isDeveloper Then
+                            ElseIf cp.User.IsAdmin Then
+                                Criteria = Criteria & "and(developeronly=0)"
+                            Else
+                                Criteria = Criteria & "and(developeronly=0)and(adminonly=0)"
+                            End If
+                            Dim LastContentID As Integer
+                            Dim DupsFound As Boolean
+                            LastContentID = -1
+                            DupsFound = False
+                            SQL = "select c.id,c.name,c.contentcontrolid,c.developeronly,c.adminonly from ccContent c left join ccAddonCollectionCDefRules r on r.contentid=c.id where " & Criteria & " order by c.name"
+                            Dim cs7 As CPCSBaseClass = cp.CSNew()
+                            If cs7.OpenSQL(SQL) Then
+                                Do
+                                    Name = Trim(cs7.GetText("name"))
+                                    ContentID = cs7.GetInteger("id")
+                                    If ContentID = LastContentID Then
+                                        DupsFound = True
+                                    Else
+                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                        ContentControlID = cs7.GetInteger("ContentControlID")
+                                        NameSuffix = ""
+                                        If isDeveloper Then
+                                            If cs7.GetBoolean("developeronly") Then
+                                                NameSuffix = NameSuffix & "--"
+                                            Else
+                                                If cs7.GetBoolean("adminonly") Then
+                                                    NameSuffix = NameSuffix & "-a"
+                                                Else
+                                                    NameSuffix = NameSuffix & "ca"
+                                                End If
+                                            End If
+
+                                            Name = Name & " (" & NameSuffix & ")"
+                                        End If
+                                        s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                    End If
+                                    LastContentID = ContentID
+                                    Call cs7.GoNext()
+                                Loop While cs7.OK()
+                            End If
+                            Call cs7.Close()
+                            '
+                            'CS = Main.OpenCSSQL("default", SQL)
+                            'Do While Main.iscsok(CS)
+                            '    Name = Trim(csx.getText("name"))
+                            '    ContentID = csx.getInteger("id")
+                            '    If ContentID = LastContentID Then
+                            '        DupsFound = True
+                            '    Else
+                            '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                            '        ContentControlID = csx.getInteger("ContentControlID")
+                            '        NameSuffix = ""
+                            '        If isDeveloper Then
+                            '            If csx.getBoolean("developeronly") Then
+                            '                NameSuffix = NameSuffix & "--"
+                            '            Else
+                            '                If csx.getBoolean("adminonly") Then
+                            '                    NameSuffix = NameSuffix & "-a"
+                            '                Else
+                            '                    NameSuffix = NameSuffix & "ca"
+                            '                End If
+                            '            End If
+
+                            '            Name = Name & " (" & NameSuffix & ")"
+                            '        End If
+                            '        s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            '        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '    End If
+                            '    LastContentID = ContentID
+                            '    Call Main.NextCSRecord(CS)
+                            'Loop
+                            'Call Main.closeCs(CS)
+                            If DupsFound Then
+                                SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
+                                SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
+                                Call cp.Db.ExecuteSQL(SQL)
+                            End If
+                        Case NodeIDManageAddonsAdvanced
+                            '
+                            ' Special Case: clicked on Manage Add-ons.advanced
+                            '   edit links for Add-ons, Add-on Collections
+                            '
+                            ' Folder to Add-ons without Collections
+                            '
+                            NodeIDString = NodeIDAddonsNoCollection
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, "Add-ons With No Collection", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-ons With No Collection", AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            Name = "Add-ons"
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            Name = "Add-on Collections"
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            Name = "Aggregate Access"
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '
+                            Name = "Scripting Modules"
+                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        Case NodeIDAddonsNoCollection
+                            '
+                            ' special case: Add-on List that do not have collections
+                            '
+                            CollectionID = 0
+                            FieldList = "0 as ContentControlID,A.Name as Name,A.ID as ID,A.ID as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeAddon & " as NavIconType,A.Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as collectionid"
                             SQL = "select" _
                             & " " & FieldList _
                             & " from ccAggregateFunctions A" _
                             & " left join ccAddonCollections C on C.ID=A.CollectionID" _
                             & " where C.ID is null" _
                             & " order by A.Name"
-                        NodeType = NodeTypeEnum.NodeTypeAddon
-                        BlockSubNodes = True
-                        NodeIDString = ""
-                        Dim cs5 As CPCSBaseClass = cp.CSNew()
-                        If cs5.OpenSQL(SQL) Then
-                            Do
-                                Name = Trim(cs5.GetText("name"))
-                                addonid = cs5.GetInteger("AddonID")
-                                NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                                ContentControlID = cs5.GetInteger("ContentControlID")
-                                s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                                Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                Call cs5.GoNext()
-                            Loop While cs5.OK()
-                        End If
-                        Call cs5.Close()
-                        '
-                        'CS = Main.OpenCSSQL("default", SQL)
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText("name"))
-                        '    addonid = csx.getInteger( "AddonID")
-                        '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                        '    ContentControlID = csx.getInteger( "ContentControlID")
-                        '    s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
-                    Case NodeIDLegacyMenu
-                        '
-                        ' Special Case: build old top menus under this Navigator entry
-                        '
-                        SQL = GetMenuSQL(cp, "(parentid=0)or(parentid is null)", LegacyMenuContentName)
-                        If Not csChildList.OpenSQL(SQL) Then
+                            NodeType = NodeTypeEnum.NodeTypeAddon
+                            BlockSubNodes = True
+                            NodeIDString = ""
+                            Dim cs5 As CPCSBaseClass = cp.CSNew()
+                            If cs5.OpenSQL(SQL) Then
+                                Do
+                                    Name = Trim(cs5.GetText("name"))
+                                    addonid = cs5.GetInteger("AddonID")
+                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                    ContentControlID = cs5.GetInteger("ContentControlID")
+                                    s = s & GetNavigatorNode(cp, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                    Call cs5.GoNext()
+                                Loop While cs5.OK()
+                            End If
+                            Call cs5.Close()
                             '
-                            ' Empty list, add to EmptyNodeList
+                            'CS = Main.OpenCSSQL("default", SQL)
+                            'Do While Main.iscsok(CS)
+                            '    Name = Trim(csx.getText("name"))
+                            '    addonid = csx.getInteger( "AddonID")
+                            '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                            '    ContentControlID = csx.getInteger( "ContentControlID")
+                            '    s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '    Call Main.NextCSRecord(CS)
+                            'Loop
+                            'Call Main.closeCs(CS)
+                        Case NodeIDLegacyMenu
                             '
-                            EmptyNodeList = EmptyNodeList & "," & TopParentNode
-                        End If
-                        ''
-                        'CS = Main.OpenCSSQL("default", SQL)
-                        'BlockSubNodes = False
-                        'If Not Main.iscsok(CS) Then
-                        '    '
-                        '    ' Empty list, add to EmptyNodeList
-                        '    '
-                        '    EmptyNodeList = EmptyNodeList & "," & TopParentNode
-                        'End If
-                    Case NodeIDAllContentList
-                        '
-                        ' special case: all content
-                        '
-                        FieldList = "Name,ID,0 as AddonID,0 as NewWindow,ID as ContentID,'' as LinkPage," & NavIconTypeContent & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,0 as collectionid"
-                        Call csChildList.Open("content", , , , FieldList)
-                        'CS = Main.openCSContent("Content", , , , , , FieldList)
-                        NodeType = NodeTypeEnum.NodeTypeContent
-                        BlockSubNodes = True
-                    Case "0", ""
-                        '
-                        ' Navigator Entries, list home(s) plus all roots
-                        '
-                        NodeType = NodeTypeEnum.NodeTypeEntry
-                        BlockSubNodes = False
-                        Link = cp.Utils.EncodeHTML("http://" & cp.Site.Domain)
-                        s = s & cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconPublicHome & "</A>&nbsp;<A href=""" & Link & """>Public Home</A></div>"
-                        Link = cp.Utils.EncodeHTML(cp.Site.GetText("adminUrl"))
-                        s = s & cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconAdminHome & "</A>&nbsp;<A href=""" & Link & """>Admin Home</A></div>"
-                        Dim cs8 As CPCSBaseClass = cp.CSNew()
-                        If cs8.OpenSQL(GetMenuSQL(cp, "((Parentid=0)or(Parentid is null))", NavigatorContentName)) Then
-                            Name = Trim(cs8.GetText("name"))
-                            NavigatorID = cs8.GetInteger("ID")
-                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                            NodeIDString = CStr(NavigatorID)
-                            If AutoManageAddons Then
+                            ' Special Case: build old top menus under this Navigator entry
+                            '
+                            BlockSubNodes = False
+                            SQL = GetMenuSQL(cp, "(parentid=0)or(parentid is null)", LegacyMenuContentName)
+                            If Not csChildList.OpenSQL(SQL) Then
                                 '
-                                ' special cases - root nodes that do not just deliver menu entries
+                                ' Empty list, add to EmptyNodeList
                                 '
-                                Select Case LCase(Name)
-                                    Case "manage add-ons"
-                                        NodeIDString = NodeIDManageAddons
-                                    Case "settings"
-                                        NodeIDString = NodeIDSettings
-                                    Case "tools"
-                                        NodeIDString = NodeIDTools
-                                    Case "reports"
-                                        NodeIDString = NodeIDReports
-                                End Select
+                                EmptyNodeList = EmptyNodeList & "," & TopParentNode
                             End If
-                            If Name = "Manage Content" Then
-                                Name = Name
-                            End If
-                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        End If
-                        Call cs8.Close()
-                        '.
-                        'CS = Main.OpenCSSQL("default", GetMenuSQL("((Parentid=0)or(Parentid is null))", NavigatorContentName))
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText("name"))
-                        '    NavigatorID = csx.getInteger("ID")
-                        '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                        '    NodeIDString = CStr(NavigatorID)
-                        '    If AutoManageAddons Then
-                        '        '
-                        '        ' special cases - root nodes that do not just deliver menu entries
-                        '        '
-                        '        Select Case LCase(Name)
-                        '            Case "manage add-ons"
-                        '                NodeIDString = NodeIDManageAddons
-                        '            Case "settings"
-                        '                NodeIDString = NodeIDSettings
-                        '            Case "tools"
-                        '                NodeIDString = NodeIDTools
-                        '            Case "reports"
-                        '                NodeIDString = NodeIDReports
-                        '        End Select
-                        '    End If
-                        '    If Name = "Manage Content" Then
-                        '        Name = Name
-                        '    End If
-                        '    s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
-                        '
-                        ' Add a Legacy Menu node to the top-most parent menu at the very end
-                        '
-                        If cp.Utils.EncodeBoolean(cp.Site.GetText("AllowNavigatorLegacyEntry", "0")) Then
-                            Name = "Legacy Menu"
-                            NavIconTitleHtmlEncoded = "Legacy Menu"
-                            NodeIDString = NodeIDLegacyMenu
-                            s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        End If
-                    Case NodeIDSettings
-                        '
-                        ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
-                        '
-                        s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 3, cp.Content.GetRecordID("navigator entries", "settings"), NavIconTypeSetting, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                    Case NodeIDTools
-                        '
-                        ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
-                        '
-                        s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 4, cp.Content.GetRecordID("navigator entries", "tools"), NavIconTypeTool, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                    Case NodeIDReports
-                        '
-                        ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
-                        '
-                        s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 2, cp.Content.GetRecordID("navigator entries", "reports"), NavIconTypeReport, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                    Case Else
-                        '
-                        ' numeric node (default case) - list navigator records with parent=TopParentNode
-                        '
-                        CS = -1
-                        If IsNumeric(TopParentNode) Then
-                            If InStr(1, EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
-                                EmptyNodeList = EmptyNodeList
-                            Else
-                                '
-                                ' Navigator Entries, child under TopParentNode
-                                '
-                                SQL = GetMenuSQL(cp, "parentid=" & TopParentNode, "")
-                                BlockSubNodes = False
-                                If csChildList.OpenSQL(SQL) Then
-                                    '
-                                    ' Empty list, add to EmptyNodeList
-                                    '
-                                    EmptyNodeList = EmptyNodeList & "," & TopParentNode
-                                End If
-                                ''
-                                'CS = Main.OpenCSSQL("default", SQL)
-                                'BlockSubNodes = False
-                                ''NodeIDStringPrefix = "n"
-                                'If Not Main.iscsok(CS) Then
-                                '    '
-                                '    ' Empty list, add to EmptyNodeList
-                                '    '
-                                '    EmptyNodeList = EmptyNodeList & "," & TopParentNode
-                                '    'Call cp.cache.save(BakeName, EmptyNodeList, "Navigator Entries")
-                                'End If
-                            End If
-                        End If
-                End Select
-                '
-                ' ----- List Navigator Nodes, if not already displayed
-                '
-                If (Not csChildList.OK) And (NodeType = NodeTypeEnum.NodeTypeEntry) Then
-                    '
-                    ' No child nodes, if this node includes a CID, list the first 20 content records with a 'more'
-                    '
-                    ContentID = 0
-                    If IsNumeric(TopParentNode) Then
-                        Call csChildList.Close()
-                        'Dim cs9 As CPCSBaseClass = cp.CSNew()
-                        If csChildList.Open(NavigatorContentName, "id=" & TopParentNode) Then
-                            ContentID = csChildList.GetInteger("ContentID")
-                        End If
-                        '
-                        'CS = Main.openCSContent(NavigatorContentName, "id=" & TopParentNode)
-                        'If Main.iscsok(CS) Then
-                        '    ContentID = csx.getInteger("ContentID")
-                        'End If
-                        If ContentID <> 0 Then
-                            ContentID = ContentID
-                            ContentName = cp.Content.GetRecordName("content", ContentID)
-                            If ContentName <> "" Then
-                                'ContentTableName =cp.Content.GetTable(ContentName)
-                                csChildList.Close()
-                                Ptr = 0
-                                If csChildList.Open(ContentName, , , , "ID,Name,ContentControlID", 20, 1) Then
-                                    EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
-                                    Do
-                                        NavigatorID = csChildList.GetInteger("ID")
-                                        RecordName = csChildList.GetText("Name")
-                                        If RecordName = "" Then
-                                            RecordName = "Record " & NavigatorID
-                                        End If
+                            ''
+                            'CS = Main.OpenCSSQL("default", SQL)
+                            'BlockSubNodes = False
+                            'If Not Main.iscsok(CS) Then
+                            '    '
+                            '    ' Empty list, add to EmptyNodeList
+                            '    '
+                            '    EmptyNodeList = EmptyNodeList & "," & TopParentNode
+                            'End If
+                        Case NodeIDAllContentList
+                            '
+                            ' special case: all content
+                            '
+                            FieldList = "Name,ID,0 as AddonID,0 as NewWindow,ID as ContentID,'' as LinkPage," & NavIconTypeContent & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,0 as collectionid"
+                            Call csChildList.Open("content", , "name", , FieldList)
+                            'CS = Main.openCSContent("Content", , , , , , FieldList)
+                            NodeType = NodeTypeEnum.NodeTypeContent
+                            BlockSubNodes = True
+                        Case "0", ""
+                            '
+                            ' Navigator Entries, list home(s) plus all roots
+                            '
+                            NodeType = NodeTypeEnum.NodeTypeEntry
+                            BlockSubNodes = False
+                            Link = cp.Utils.EncodeHTML("http://" & cp.Site.Domain)
+                            s = s & cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconPublicHome & "</A>&nbsp;<A href=""" & Link & """>Public Home</A></div>"
+                            Link = cp.Utils.EncodeHTML(cp.Site.GetText("adminUrl"))
+                            s = s & cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconAdminHome & "</A>&nbsp;<A href=""" & Link & """>Admin Home</A></div>"
+                            Dim cs8 As CPCSBaseClass = cp.CSNew()
+                            If cs8.OpenSQL(GetMenuSQL(cp, "((Parentid=0)or(Parentid is null))", NavigatorContentName)) Then
+                                Do
+                                    Name = Trim(cs8.GetText("name"))
+                                    NavigatorID = cs8.GetInteger("ID")
+                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                    NodeIDString = CStr(NavigatorID)
+                                    If AutoManageAddons Then
                                         '
-                                        If Len(RecordName) > 53 Then
-                                            RecordName = Left(RecordName, 25) & "..." & Right(RecordName, 25)
-                                        End If
-                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Edit '" & RecordName & "' in '" & ContentName & "'")
-                                        IconNoSubNodes = IconRecord
-                                        IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
-                                        Link = "?id=" & NavigatorID & "&cid=" & csChildList.GetInteger("ContentControlID") & "&af=4"
-                                        ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
-                                        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & RecordName & "</a></div>"
-                                        Ptr = Ptr + 1
-                                        Call csChildList.GoNext()
-                                    Loop While csChildList.OK() And Ptr < 20
-                                    If Ptr = 20 Then
-                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Open All '" & NavigatorContentName & "'")
-                                        Link = "?cid=" & ContentID
-                                        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconClosed & "&nbsp;<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>more...</a></div>"
+                                        ' special cases - root nodes that do not just deliver menu entries
+                                        '
+                                        Select Case LCase(Name)
+                                            Case "manage add-ons"
+                                                NodeIDString = NodeIDManageAddons
+                                            Case "settings"
+                                                NodeIDString = NodeIDSettings
+                                            Case "tools"
+                                                NodeIDString = NodeIDTools
+                                            Case "reports"
+                                                NodeIDString = NodeIDReports
+                                        End Select
                                     End If
+                                    s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                    Call cs8.GoNext()
+                                Loop While cs8.OK
+                            End If
+                            Call cs8.Close()
+                            '.
+                            'CS = Main.OpenCSSQL("default", GetMenuSQL("((Parentid=0)or(Parentid is null))", NavigatorContentName))
+                            'Do While Main.iscsok(CS)
+                            '    Name = Trim(csx.getText("name"))
+                            '    NavigatorID = csx.getInteger("ID")
+                            '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                            '    NodeIDString = CStr(NavigatorID)
+                            '    If AutoManageAddons Then
+                            '        '
+                            '        ' special cases - root nodes that do not just deliver menu entries
+                            '        '
+                            '        Select Case LCase(Name)
+                            '            Case "manage add-ons"
+                            '                NodeIDString = NodeIDManageAddons
+                            '            Case "settings"
+                            '                NodeIDString = NodeIDSettings
+                            '            Case "tools"
+                            '                NodeIDString = NodeIDTools
+                            '            Case "reports"
+                            '                NodeIDString = NodeIDReports
+                            '        End Select
+                            '    End If
+                            '    s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            '    Call Main.NextCSRecord(CS)
+                            'Loop
+                            'Call Main.closeCs(CS)
+                            '
+                            ' Add a Legacy Menu node to the top-most parent menu at the very end
+                            '
+                            If cp.Utils.EncodeBoolean(cp.Site.GetText("AllowNavigatorLegacyEntry", "0")) Then
+                                Name = "Legacy Menu"
+                                NavIconTitleHtmlEncoded = "Legacy Menu"
+                                NodeIDString = NodeIDLegacyMenu
+                                s = s & GetNavigatorNode(cp, 0, 0, 0, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeFolder, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                                Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            End If
+                        Case NodeIDSettings
+                            '
+                            ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
+                            '
+                            s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 3, cp.Content.GetRecordID("navigator entries", "settings"), NavIconTypeSetting, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        Case NodeIDTools
+                            '
+                            ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
+                            '
+                            s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 4, cp.Content.GetRecordID("navigator entries", "tools"), NavIconTypeTool, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        Case NodeIDReports
+                            '
+                            ' list setting nodes, includes menu nodes with setting parents, and addons with type=setting sorted in
+                            '
+                            s = s & GetNavigator_MixedNode(cp, EmptyNodeList, TopParentNode, LegacyMenuControlID, AutoManageAddons, NodeType, OpenNodeList, 2, cp.Content.GetRecordID("navigator entries", "reports"), NavIconTypeReport, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        Case Else
+                            '
+                            ' numeric node (default case) - list navigator records with parent=TopParentNode
+                            '
+                            CS = -1
+                            If IsNumeric(TopParentNode) Then
+                                If InStr(1, EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
+                                    EmptyNodeList = EmptyNodeList
+                                Else
+                                    '
+                                    ' Navigator Entries, child under TopParentNode
+                                    '
+                                    SQL = GetMenuSQL(cp, "parentid=" & TopParentNode, "")
+                                    BlockSubNodes = False
+                                    If csChildList.OpenSQL(SQL) Then
+                                        '
+                                        ' Empty list, add to EmptyNodeList
+                                        '
+                                        EmptyNodeList = EmptyNodeList & "," & TopParentNode
+                                    End If
+                                    ''
+                                    'CS = Main.OpenCSSQL("default", SQL)
+                                    'BlockSubNodes = False
+                                    ''NodeIDStringPrefix = "n"
+                                    'If Not Main.iscsok(CS) Then
+                                    '    '
+                                    '    ' Empty list, add to EmptyNodeList
+                                    '    '
+                                    '    EmptyNodeList = EmptyNodeList & "," & TopParentNode
+                                    '    'Call cp.cache.save(BakeName, EmptyNodeList, "Navigator Entries")
+                                    'End If
                                 End If
-                                'CS = Main.openCSContent(ContentName, , , , , , "ID,Name,ContentControlID", 20, 1)
-                                ' SQL = "select top 20 " _
-                                '     & " ID,Name,ContentControlID from " & ContentTableName
-                                ' CS = Main.OpenCSSQL("default", SQL)
-                                'Ptr = 0
-                                'If Main.iscsok(CS) Then
-                                '    EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
-                                '    Do While Main.iscsok(CS) And Ptr < 20
-                                '        NavigatorID = csx.getInteger("ID")
-                                '        RecordName = csx.getText("Name")
-                                '        If RecordName = "" Then
-                                '            RecordName = "Record " & NavigatorID
-                                '        End If
-                                '        '
-                                '        If Len(RecordName) > 53 Then
-                                '            RecordName = Left(RecordName, 25) & "..." & Right(RecordName, 25)
-                                '        End If
-                                '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Edit '" & RecordName & "' in '" & ContentName & "'")
-                                '        IconNoSubNodes = IconRecord
-                                '        IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
-                                '        Link = "?id=" & NavigatorID & "&cid=" & csx.getInteger("ContentControlID") & "&af=4"
-                                '        ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
-                                '        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & RecordName & "</a></div>"
-                                '        Ptr = Ptr + 1
-                                '        Call Main.NextCSRecord(CS)
-                                '    Loop
-                                '    If Ptr = 20 Then
-                                '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Open All '" & NavigatorContentName & "'")
-                                '        Link = "?cid=" & ContentID
-                                '        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconClosed & "&nbsp;<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>more...</a></div>"
-                                '    End If
-                                'End If
+                            End If
+                    End Select
+                    '
+                    ' ----- List Navigator Nodes, if not already displayed
+                    '
+                    If (Not csChildList.OK) And (NodeType = NodeTypeEnum.NodeTypeEntry) Then
+                        '
+                        ' No child nodes, if this node includes a CID, list the first 20 content records with a 'more'
+                        '
+                        ContentID = 0
+                        If IsNumeric(TopParentNode) Then
+                            Call csChildList.Close()
+                            'Dim cs9 As CPCSBaseClass = cp.CSNew()
+                            If csChildList.Open(NavigatorContentName, "id=" & TopParentNode) Then
+                                ContentID = csChildList.GetInteger("ContentID")
+                            End If
+                            '
+                            'CS = Main.openCSContent(NavigatorContentName, "id=" & TopParentNode)
+                            'If Main.iscsok(CS) Then
+                            '    ContentID = csx.getInteger("ContentID")
+                            'End If
+                            If ContentID <> 0 Then
+                                ContentID = ContentID
+                                ContentName = cp.Content.GetRecordName("content", ContentID)
+                                If ContentName <> "" Then
+                                    'ContentTableName =cp.Content.GetTable(ContentName)
+                                    csChildList.Close()
+                                    Ptr = 0
+                                    If csChildList.Open(ContentName, , "name", , "ID,Name,ContentControlID", 20, 1) Then
+                                        EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
+                                        Do
+                                            NavigatorID = csChildList.GetInteger("ID")
+                                            RecordName = csChildList.GetText("Name")
+                                            If RecordName = "" Then
+                                                RecordName = "Record " & NavigatorID
+                                            End If
+                                            '
+                                            If Len(RecordName) > 53 Then
+                                                RecordName = Left(RecordName, 25) & "..." & Right(RecordName, 25)
+                                            End If
+                                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Edit '" & RecordName & "' in '" & ContentName & "'")
+                                            IconNoSubNodes = IconRecord
+                                            IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
+                                            Link = "?id=" & NavigatorID & "&cid=" & csChildList.GetInteger("ContentControlID") & "&af=4"
+                                            ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
+                                            s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & RecordName & "</a></div>"
+                                            Ptr = Ptr + 1
+                                            Call csChildList.GoNext()
+                                        Loop While csChildList.OK() And Ptr < 20
+                                        If Ptr = 20 Then
+                                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Open All '" & NavigatorContentName & "'")
+                                            Link = "?cid=" & ContentID
+                                            s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconClosed & "&nbsp;<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>more...</a></div>"
+                                        End If
+                                    End If
+                                    'CS = Main.openCSContent(ContentName, , , , , , "ID,Name,ContentControlID", 20, 1)
+                                    ' SQL = "select top 20 " _
+                                    '     & " ID,Name,ContentControlID from " & ContentTableName
+                                    ' CS = Main.OpenCSSQL("default", SQL)
+                                    'Ptr = 0
+                                    'If Main.iscsok(CS) Then
+                                    '    EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
+                                    '    Do While Main.iscsok(CS) And Ptr < 20
+                                    '        NavigatorID = csx.getInteger("ID")
+                                    '        RecordName = csx.getText("Name")
+                                    '        If RecordName = "" Then
+                                    '            RecordName = "Record " & NavigatorID
+                                    '        End If
+                                    '        '
+                                    '        If Len(RecordName) > 53 Then
+                                    '            RecordName = Left(RecordName, 25) & "..." & Right(RecordName, 25)
+                                    '        End If
+                                    '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Edit '" & RecordName & "' in '" & ContentName & "'")
+                                    '        IconNoSubNodes = IconRecord
+                                    '        IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
+                                    '        Link = "?id=" & NavigatorID & "&cid=" & csx.getInteger("ContentControlID") & "&af=4"
+                                    '        ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
+                                    '        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & RecordName & "</a></div>"
+                                    '        Ptr = Ptr + 1
+                                    '        Call Main.NextCSRecord(CS)
+                                    '    Loop
+                                    '    If Ptr = 20 Then
+                                    '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Open All '" & NavigatorContentName & "'")
+                                    '        Link = "?cid=" & ContentID
+                                    '        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconClosed & "&nbsp;<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>more...</a></div>"
+                                    '    End If
+                                    'End If
+                                End If
                             End If
                         End If
+                    ElseIf csChildList.OK Then
+                        '
+                        ' List out child menus
+                        '
+                        Do
+                            CollectionID = csChildList.GetInteger("CollectionID")
+                            NavigatorID = csChildList.GetInteger("ID")
+                            Name = Trim(csChildList.GetText("name"))
+                            NewWindow = csChildList.GetBoolean("newwindow")
+                            ContentID = csChildList.GetInteger("ContentID")
+                            Link = Trim(csChildList.GetText("LinkPage"))
+                            addonid = csChildList.GetInteger("AddonID")
+                            NavIconType = csChildList.GetInteger("NavIconType")
+                            NavIconTitle = csChildList.GetText("NavIconTitle")
+                            HelpAddonID = csChildList.GetInteger("HelpAddonID")
+                            If HelpAddonID <> 0 Then
+                                HelpAddonID = HelpAddonID
+                            End If
+                            helpCollectionID = csChildList.GetInteger("HelpCollectionID")
+                            If NavIconTitle = "" Then
+                                NavIconTitle = Name
+                            End If
+                            ContentControlID = csChildList.GetInteger("ContentControlID")
+                            If LCase(Name) = "all content" Then
+                                '
+                                ' special case: any Navigator Entry named 'all content' returns the content list
+                                '
+                                NodeIDString = NodeIDAllContentList
+                            Else
+                                NodeIDString = CStr(NavigatorID)
+                            End If
+                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                            s = s & GetNavigatorNode(cp, CollectionID, ContentControlID, helpCollectionID, HelpAddonID, ContentID, Link, addonid, SettingPageID, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeType, NewWindow, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS)
+                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                            Call csChildList.GoNext()
+                        Loop While csChildList.OK
+                        Call csChildList.Close()
                     End If
-                ElseIf csChildList.OK Then
                     '
-                    ' List out child menus
                     '
-                    Do
-                        CollectionID = csChildList.GetInteger("CollectionID")
-                        NavigatorID = csChildList.GetInteger("ID")
-                        Name = Trim(csChildList.GetText("name"))
-                        NewWindow = csChildList.GetBoolean("newwindow")
-                        ContentID = csChildList.GetInteger("ContentID")
-                        Link = Trim(csChildList.GetText("LinkPage"))
-                        addonid = csChildList.GetInteger("AddonID")
-                        NavIconType = csChildList.GetInteger("NavIconType")
-                        NavIconTitle = csChildList.GetText("NavIconTitle")
-                        HelpAddonID = csChildList.GetInteger("HelpAddonID")
-                        If HelpAddonID <> 0 Then
-                            HelpAddonID = HelpAddonID
-                        End If
-                        helpCollectionID = csChildList.GetInteger("HelpCollectionID")
-                        If NavIconTitle = "" Then
-                            NavIconTitle = Name
-                        End If
-                        ContentControlID = csChildList.GetInteger("ContentControlID")
-                        If LCase(Name) = "all content" Then
-                            '
-                            ' special case: any Navigator Entry named 'all content' returns the content list
-                            '
-                            NodeIDString = NodeIDAllContentList
-                        Else
-                            NodeIDString = CStr(NavigatorID)
-                        End If
-                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                        s = s & GetNavigatorNode(cp, CollectionID, ContentControlID, helpCollectionID, HelpAddonID, ContentID, Link, addonid, SettingPageID, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeType, NewWindow, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS)
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        Call csChildList.GoNext()
-                    Loop While csChildList.OK
-                    Call csChildList.Close()
+                    '
+                    If EmptyNodeListInitial <> EmptyNodeList Then
+                        Call cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries")
+                    End If
+                    returnNav = s
+                    '        If Return_NavigatorJS <> "" Then
+                    '            Return_NavigatorJS = "" _
+                    '                & "if(window.navDrop) {" _
+                    '                & Return_NavigatorJS _
+                    '                & "};"
+                    '            Callcp.Doc.AddHeadJavascript(Return_NavigatorJS, "Admin Navigator")
+                    '            'Callcp.Doc.AddHeadJavascript("alert('addheadscriptcode');", "Admin Navigator")
+                    '        End If
                 End If
                 '
+                ' ----- Timer Trace
+                'Main.ToolsPanelTimerTrace = Replace(Main.ToolsPanelTimerTrace, TimerTraceMarker, (GetTickCount - StartTickCount)) & CR & "</ul>"
+                ' ----- /Timer Trace
                 '
-                '
-                If EmptyNodeListInitial <> EmptyNodeList Then
-                    Call cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries")
-                End If
-                GetNavigator = s
-                '        If Return_NavigatorJS <> "" Then
-                '            Return_NavigatorJS = "" _
-                '                & "if(window.navDrop) {" _
-                '                & Return_NavigatorJS _
-                '                & "};"
-                '            Callcp.Doc.AddHeadJavascript(Return_NavigatorJS, "Admin Navigator")
-                '            'Callcp.Doc.AddHeadJavascript("alert('addheadscriptcode');", "Admin Navigator")
-                '        End If
-            End If
-            '
-            ' ----- Timer Trace
-            'Main.ToolsPanelTimerTrace = Replace(Main.ToolsPanelTimerTrace, TimerTraceMarker, (GetTickCount - StartTickCount)) & CR & "</ul>"
-            ' ----- /Timer Trace
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call cp.Site.ErrorReport(("GetNavigator")
+            Catch ex As Exception
+                Call HandleError(cp, ex)
+            End Try
+            Return returnNav
         End Function
         '
         '========================================================================
         '   list mixed nodes (settings/reports/tools)
         '========================================================================
         '
-
         Friend Function GetNavigator_MixedNode(cp As CPBaseClass, EmptyNodeList As String, TopParentNode As String, LegacyMenuControlID As Integer, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, OpenNodeList As String, AddonNavTypeID As Integer, MenuParentNodeID As Integer, AdminNavIconTypeSetting As Integer, ByRef Return_DraggableJS As String) As String
-            GetNavigator_MixedNode = ""
-            On Error GoTo ErrorTrap
-            '
-            Dim NodeDraggableJS As String
-            Dim LastName As String
-            Dim Index As New keyPtrIndexClass
-            Dim SortNodes() As SortNodeType
-            Dim SortPtr As Integer
-            Dim SortCnt As Integer
-            Dim testPtr As Integer
-            Dim NameSuffix As String
-            Dim NodeID As Integer
-            Dim NodeIDString As String
-            Dim SQL As String
-            Dim CS As Integer
-            Dim Criteria As String
-            Dim BlockSubNodes As Boolean
-            '
-            ' list mixed nodes (settings/reports/tools), includes menu nodes and addons with type='setting' sorted in
-            '
-            If InStr(1, EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
-                EmptyNodeList = EmptyNodeList
-            Else
+            Dim returnNav As String = ""
+            Try
+                Dim NodeDraggableJS As String
+                Dim LastName As String
+                Dim Index As New keyPtrIndexClass
+                Dim SortNodes() As SortNodeType
+                Dim SortPtr As Integer
+                Dim testPtr As Integer
+                Dim NodeIDString As String
+                Dim SQL As String
+                Dim Criteria As String
+                Dim BlockSubNodes As Boolean
                 '
-                ' Add addons to node list
+                ' list mixed nodes (settings/reports/tools), includes menu nodes and addons with type='setting' sorted in
                 '
-                NodeIDString = ""
-                Criteria = "(navtypeid=" & AddonNavTypeID & ")"
-                If (AddonNavTypeID = 2) Or (AddonNavTypeID = 3) Or (AddonNavTypeID = 4) Then
-                    '
-                    ' if setting, report or tool, "admin" is not needed
-                    '
+                If InStr(1, EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
+                    EmptyNodeList = EmptyNodeList
                 Else
                     '
-                    ' for Manage Addons node, admin is needed for non-developer
+                    ' Add addons to node list
                     '
-                    If Not cp.User.IsDeveloper() Then
-                        Criteria = Criteria & "and(admin<>0)"
+                    NodeIDString = ""
+                    Criteria = "(navtypeid=" & AddonNavTypeID & ")"
+                    If (AddonNavTypeID = 2) Or (AddonNavTypeID = 3) Or (AddonNavTypeID = 4) Then
+                        '
+                        ' if setting, report or tool, "admin" is not needed
+                        '
+                    Else
+                        '
+                        ' for Manage Addons node, admin is needed for non-developer
+                        '
+                        If Not cp.User.IsDeveloper() Then
+                            Criteria = Criteria & "and(admin<>0)"
+                        End If
+                    End If
+                    Dim cs10 As CPCSBaseClass = cp.CSNew
+                    If cs10.Open("add-ons", Criteria, "name") Then
+                        Do
+                            ReDim Preserve SortNodes(SortPtr)
+                            With SortNodes(SortPtr)
+                                .Name = Trim(cs10.GetText("name"))
+                                .addonid = cs10.GetInteger("ID")
+                                .NavIconTitle = .Name
+                                .ContentControlID = cs10.GetInteger("ContentControlID")
+                                .NavIconType = AdminNavIconTypeSetting
+                                Call Index.SetPointer(.Name, SortPtr)
+                            End With
+                            SortPtr = SortPtr + 1
+                            cs10.GoNext()
+                        Loop While cs10.OK
+                    End If
+                    cs10.Close()
+                    '
+                    'CS = Main.openCSContent("Add-ons", Criteria, , , , , "*")
+                    'SortPtr = 0
+                    'Do While Main.iscsok(CS)
+                    '    ReDim Preserve SortNodes(SortPtr)
+                    '    With SortNodes(SortPtr)
+                    '        .Name = Trim(csx.getText("name"))
+                    '        .addonid = csx.getinteger( "ID")
+                    '        .NavIconTitle = .Name
+                    '        .ContentControlID = csx.getinteger( "ContentControlID")
+                    '        .NavIconType = AdminNavIconTypeSetting
+                    '        Call Index.SetPointer(.Name, SortPtr)
+                    '    End With
+                    '    SortPtr = SortPtr + 1
+                    '    Call Main.NextCSRecord(CS)
+                    'Loop
+                    'Call Main.closeCs(CS)
+                    '
+                    ' Add real navigator nodes to node list
+                    '
+                    SQL = GetMenuSQL(cp, "parentid=" & MenuParentNodeID, "")
+                    Dim cs11 As CPCSBaseClass = cp.CSNew
+                    If cs11.OpenSQL(SQL) Then
+                        Do
+                            ReDim Preserve SortNodes(SortPtr)
+                            With SortNodes(SortPtr)
+                                .Name = Trim(cs11.GetText("name"))
+                                .NavigatorID = cs11.GetInteger("ID")
+                                .CollectionID = cs11.GetInteger("CollectionID")
+                                .NewWindow = cs11.GetBoolean("newwindow")
+                                .ContentID = cs11.GetInteger("ContentID")
+                                .Link = Trim(cs11.GetText("LinkPage"))
+                                .addonid = cs11.GetInteger("AddonID")
+                                .NavIconType = cs11.GetInteger("NavIconType")
+                                .NavIconTitle = cs11.GetText("NavIconTitle")
+                                .HelpAddonID = cs11.GetInteger("HelpAddonID")
+                                .helpCollectionID = cs11.GetInteger("HelpCollectionID")
+                                If .NavIconTitle = "" Then
+                                    .NavIconTitle = .Name
+                                End If
+                                .ContentControlID = cs11.GetInteger("ContentControlID")
+                                If LCase(.Name) = "all content" Then
+                                    '
+                                    ' special case: any Navigator Entry named 'all content' returns the content list
+                                    '
+                                    .NodeIDString = NodeIDAllContentList
+                                Else
+                                    .NodeIDString = CStr(.NavigatorID)
+                                    .NavIconTitle = .Name
+                                    .ContentControlID = cs11.GetInteger("ContentControlID")
+                                End If
+                                Call Index.SetPointer(.Name, SortPtr)
+                            End With
+                            SortPtr = SortPtr + 1
+                            Call cs11.GoNext()
+                        Loop While cs11.OK
+                    End If
+                    Call cs11.Close()
+                    '
+                    ''
+                    'CS = Main.OpenCSSQL("default", SQL)
+                    'BlockSubNodes = False
+                    'Do While Main.iscsok(CS)
+                    '    ReDim Preserve SortNodes(SortPtr)
+                    '    With SortNodes(SortPtr)
+                    '        .Name = Trim(csx.getText("name"))
+                    '        .NavigatorID = csx.getinteger("ID")
+                    '        .CollectionID = csx.getinteger("CollectionID")
+                    '        .NewWindow = csx.getBoolean("newwindow")
+                    '        .ContentID = csx.getinteger("ContentID")
+                    '        .Link = Trim(csx.getText("LinkPage"))
+                    '        .addonid = csx.getinteger("AddonID")
+                    '        .NavIconType = csx.getinteger("NavIconType")
+                    '        .NavIconTitle = csx.getText("NavIconTitle")
+                    '        .HelpAddonID = csx.getinteger("HelpAddonID")
+                    '        .helpCollectionID = csx.getinteger("HelpCollectionID")
+                    '        If .NavIconTitle = "" Then
+                    '            .NavIconTitle = .Name
+                    '        End If
+                    '        .ContentControlID = csx.getinteger("ContentControlID")
+                    '        If LCase(.Name) = "all content" Then
+                    '            '
+                    '            ' special case: any Navigator Entry named 'all content' returns the content list
+                    '            '
+                    '            .NodeIDString = NodeIDAllContentList
+                    '        Else
+                    '            .NodeIDString = CStr(.NavigatorID)
+                    '            .NavIconTitle = .Name
+                    '            .ContentControlID = csx.getinteger("ContentControlID")
+                    '        End If
+                    '        Call Index.SetPointer(.Name, SortPtr)
+                    '    End With
+                    '    SortPtr = SortPtr + 1
+                    '    Call Main.NextCSRecord(CS)
+                    'Loop
+                    'Call Main.closeCs(CS)
+                    testPtr = Index.GetFirstPointer()
+                    If testPtr = -1 Then
+                        '
+                        ' Empty list, add to EmptyNodeList
+                        '
+                        EmptyNodeList = EmptyNodeList & "," & TopParentNode
+                    Else
+                        LastName = ""
+                        Do While testPtr <> -1
+                            SortPtr = cp.Utils.EncodeInteger(testPtr)
+                            With SortNodes(SortPtr)
+                                If LCase(.Name) <> LastName Then
+                                    returnNav = returnNav & GetNavigatorNode(cp, .CollectionID, .ContentControlID, .helpCollectionID, .HelpAddonID, .ContentID, .Link, .addonid, 0, .Name, LegacyMenuControlID, EmptyNodeList, .NavigatorID, .NavIconType, cp.Utils.EncodeHTML(.NavIconTitle), AutoManageAddons, NodeType, .NewWindow, BlockSubNodes, OpenNodeList, .NodeIDString, NodeDraggableJS)
+                                    Return_DraggableJS = Return_DraggableJS & NodeDraggableJS
+                                    LastName = LCase(.Name)
+                                End If
+                            End With
+                            testPtr = Index.GetNextPointer()
+                        Loop
                     End If
                 End If
-                Dim cs10 As CPCSBaseClass = cp.CSNew
-                If cs10.Open("add-ons", Criteria) Then
-                    ReDim Preserve SortNodes(SortPtr)
-                    With SortNodes(SortPtr)
-                        .Name = Trim(cs10.GetText("name"))
-                        .addonid = cs10.GetInteger("ID")
-                        .NavIconTitle = .Name
-                        .ContentControlID = cs10.GetInteger("ContentControlID")
-                        .NavIconType = AdminNavIconTypeSetting
-                        Call Index.SetPointer(.Name, SortPtr)
-                    End With
-                    SortPtr = SortPtr + 1
-
-                    cs10.GoNext()
-                End If
-                cs10.Close()
-                '
-                'CS = Main.openCSContent("Add-ons", Criteria, , , , , "*")
-                'SortPtr = 0
-                'Do While Main.iscsok(CS)
-                '    ReDim Preserve SortNodes(SortPtr)
-                '    With SortNodes(SortPtr)
-                '        .Name = Trim(csx.getText("name"))
-                '        .addonid = csx.getinteger( "ID")
-                '        .NavIconTitle = .Name
-                '        .ContentControlID = csx.getinteger( "ContentControlID")
-                '        .NavIconType = AdminNavIconTypeSetting
-                '        Call Index.SetPointer(.Name, SortPtr)
-                '    End With
-                '    SortPtr = SortPtr + 1
-                '    Call Main.NextCSRecord(CS)
-                'Loop
-                'Call Main.closeCs(CS)
-                '
-                ' Add real navigator nodes to node list
-                '
-                SQL = GetMenuSQL(cp, "parentid=" & MenuParentNodeID, "")
-                Dim cs11 As CPCSBaseClass = cp.CSNew
-                If cs11.OpenSQL(SQL) Then
-                    Do
-                        ReDim Preserve SortNodes(SortPtr)
-                        With SortNodes(SortPtr)
-                            .Name = Trim(cs11.GetText("name"))
-                            .NavigatorID = cs11.GetInteger("ID")
-                            .CollectionID = cs11.GetInteger("CollectionID")
-                            .NewWindow = cs11.GetBoolean("newwindow")
-                            .ContentID = cs11.GetInteger("ContentID")
-                            .Link = Trim(cs11.GetText("LinkPage"))
-                            .addonid = cs11.GetInteger("AddonID")
-                            .NavIconType = cs11.GetInteger("NavIconType")
-                            .NavIconTitle = cs11.GetText("NavIconTitle")
-                            .HelpAddonID = cs11.GetInteger("HelpAddonID")
-                            .helpCollectionID = cs11.GetInteger("HelpCollectionID")
-                            If .NavIconTitle = "" Then
-                                .NavIconTitle = .Name
-                            End If
-                            .ContentControlID = cs11.GetInteger("ContentControlID")
-                            If LCase(.Name) = "all content" Then
-                                '
-                                ' special case: any Navigator Entry named 'all content' returns the content list
-                                '
-                                .NodeIDString = NodeIDAllContentList
-                            Else
-                                .NodeIDString = CStr(.NavigatorID)
-                                .NavIconTitle = .Name
-                                .ContentControlID = cs11.GetInteger("ContentControlID")
-                            End If
-                            Call Index.SetPointer(.Name, SortPtr)
-                        End With
-                        SortPtr = SortPtr + 1
-                        Call cs11.GoNext()
-                    Loop While cs11.OK
-                End If
-                Call cs11.Close()
-                '
-                ''
-                'CS = Main.OpenCSSQL("default", SQL)
-                'BlockSubNodes = False
-                'Do While Main.iscsok(CS)
-                '    ReDim Preserve SortNodes(SortPtr)
-                '    With SortNodes(SortPtr)
-                '        .Name = Trim(csx.getText("name"))
-                '        .NavigatorID = csx.getinteger("ID")
-                '        .CollectionID = csx.getinteger("CollectionID")
-                '        .NewWindow = csx.getBoolean("newwindow")
-                '        .ContentID = csx.getinteger("ContentID")
-                '        .Link = Trim(csx.getText("LinkPage"))
-                '        .addonid = csx.getinteger("AddonID")
-                '        .NavIconType = csx.getinteger("NavIconType")
-                '        .NavIconTitle = csx.getText("NavIconTitle")
-                '        .HelpAddonID = csx.getinteger("HelpAddonID")
-                '        .helpCollectionID = csx.getinteger("HelpCollectionID")
-                '        If .NavIconTitle = "" Then
-                '            .NavIconTitle = .Name
-                '        End If
-                '        .ContentControlID = csx.getinteger("ContentControlID")
-                '        If LCase(.Name) = "all content" Then
-                '            '
-                '            ' special case: any Navigator Entry named 'all content' returns the content list
-                '            '
-                '            .NodeIDString = NodeIDAllContentList
-                '        Else
-                '            .NodeIDString = CStr(.NavigatorID)
-                '            .NavIconTitle = .Name
-                '            .ContentControlID = csx.getinteger("ContentControlID")
-                '        End If
-                '        Call Index.SetPointer(.Name, SortPtr)
-                '    End With
-                '    SortPtr = SortPtr + 1
-                '    Call Main.NextCSRecord(CS)
-                'Loop
-                'Call Main.closeCs(CS)
-                testPtr = Index.GetFirstPointer()
-                If testPtr = -1 Then
-                    '
-                    ' Empty list, add to EmptyNodeList
-                    '
-                    EmptyNodeList = EmptyNodeList & "," & TopParentNode
-                Else
-                    LastName = ""
-                    Do While testPtr <> -1
-                        SortPtr = cp.Utils.EncodeInteger(testPtr)
-                        With SortNodes(SortPtr)
-                            If LCase(.Name) <> LastName Then
-                                GetNavigator_MixedNode = GetNavigator_MixedNode & GetNavigatorNode(cp, .CollectionID, .ContentControlID, .helpCollectionID, .HelpAddonID, .ContentID, .Link, .addonid, 0, .Name, LegacyMenuControlID, EmptyNodeList, .NavigatorID, .NavIconType, cp.Utils.EncodeHTML(.NavIconTitle), AutoManageAddons, NodeType, .NewWindow, BlockSubNodes, OpenNodeList, .NodeIDString, NodeDraggableJS)
-                                Return_DraggableJS = Return_DraggableJS & NodeDraggableJS
-                                LastName = LCase(.Name)
-                            End If
-                        End With
-                        testPtr = Index.GetNextPointer()
-                    Loop
-                End If
-            End If
-            '
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call cp.Site.ErrorReport("Trap")
+            Catch ex As Exception
+                HandleError(cp, ex)
+            End Try
+            Return returnNav
         End Function
-
-
         '
         '
         '
@@ -1113,7 +1103,7 @@ ErrorTrap:
             Dim workingNameHtmlEncoded As String
             Dim BlockNode As Boolean
             '
-            ' Determine is it has either a function, or child entries
+            ' Determine if it has either a function, or child entries
             '
             BlockNode = False
             Return_NavigatorJS = ""
@@ -1209,6 +1199,7 @@ ErrorTrap:
                             '
                             ' special case - if node has this name, a click to it calls back with NodeIDLegacyMenu
                             '
+
                             DivIDBase = CStr(NavigatorID)
                             'NodeIDString = NodeIDLegacyMenu
                         Case "add-ons with no collection"
@@ -1345,7 +1336,7 @@ ErrorTrap:
                         ' go to Collection Help
                         '
                         Dim cs13 As CPCSBaseClass = cp.CSNew
-                        If Not cs13.Open("add-on collections", "id=" & helpCollectionID, , , "name,helpLink,help") Then
+                        If Not cs13.Open("add-on collections", "id=" & helpCollectionID, "name", , "name,helpLink,help") Then
                             BlockNode = True
                         Else
                             collectionName = cs13.GetText("name")
@@ -1406,7 +1397,7 @@ ErrorTrap:
                 End If
                 '
                 If Not BlockNode Then
-                    If BlockSubNodes Then
+                    If BlockSubNodes Or (addonid <> 0) Then
                         '
                         ' This is a hardcoded item (like Add-on), it has no subnodes
                         '
@@ -1670,6 +1661,29 @@ ErrorTrap:
                 ' stop anything thrown from cp errorReport
                 '
             End Try
+        End Sub
+        '
+        '========================================================================
+        '   HandleError
+        '       Logs the error and either resumes next, or raises it to the next level
+        '========================================================================
+        '
+        Public Sub HandleError(cp As CPBaseClass, ByVal ex As Exception, ByVal className As String, ByVal methodName As String, ByVal cause As String)
+            Try
+                Dim errMsg As String = className & "." & methodName & ", cause=[" & cause & "], ex=[" & ex.ToString & "]"
+                cp.Site.ErrorReport(ex, errMsg)
+            Catch exIgnore As Exception
+                '
+            End Try
+        End Sub
+        '
+        Public Sub HandleError(cp As CPBaseClass, ByVal ex As Exception)
+            Dim frame As StackFrame = New StackFrame(1)
+            Dim method As System.Reflection.MethodBase = frame.GetMethod()
+            Dim type As System.Type = method.DeclaringType()
+            Dim methodName As String = method.Name
+            '
+            Call HandleError(cp, ex, type.Name, methodName, "unexpected exception")
         End Sub
     End Class
 End Namespace
