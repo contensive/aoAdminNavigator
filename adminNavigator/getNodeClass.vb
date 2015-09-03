@@ -26,6 +26,7 @@ Namespace Contensive.adminNavigator
             Public buildVersion As String
             Public addonEditAddonUrlPrefix As String
             Public addonEditCollectionUrlPrefix As String
+            Public contentFieldEditToolPrefix As String
         End Structure
         '
         '=====================================================================================
@@ -55,6 +56,7 @@ Namespace Contensive.adminNavigator
                 If env.isDeveloper Then
                     env.addonEditAddonUrlPrefix = env.adminUrl & "?cid=" & CP.Content.GetID("add-ons") & "&af=4&id="
                     env.addonEditCollectionUrlPrefix = env.adminUrl & "?cid=" & CP.Content.GetID("add-on collections") & "&af=4&id="
+                    env.contentFieldEditToolPrefix = env.adminUrl & "?af=105&contentid="
                 End If
                 '
                 OpenNodeList = CP.Visit.GetText("AdminNavOpenNodeList")
@@ -482,7 +484,7 @@ Namespace Contensive.adminNavigator
                                     Else
                                         linkSuffixList = ""
                                         If env.isDeveloper Then
-                                            linkSuffixList = "<a href=""" & env.adminUrl & "?af=105&contentid=" & ContentID & """>edit</a>"
+                                            linkSuffixList = "<a href=""" & env.contentFieldEditToolPrefix & ContentID & """>edit</a>"
                                             If cs7.GetBoolean("developeronly") Then
                                                 linkSuffixList &= ",dev"
                                             ElseIf cs7.GetBoolean("adminonly") Then
@@ -894,8 +896,15 @@ Namespace Contensive.adminNavigator
                             Else
                                 NodeIDString = CStr(NavigatorID)
                             End If
+                            linkSuffixList = ""
+                            If (ContentID <> 0) And (env.isDeveloper) Then
+                                linkSuffixList = "<a href=""" & env.contentFieldEditToolPrefix & ContentID & """>edit</a>"
+                                If Not String.IsNullOrEmpty(linkSuffixList) Then
+                                    linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
+                                End If
+                            End If
                             NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                            s = s & GetNode(cp, env, CollectionID, ContentControlID, helpCollectionID, HelpAddonID, ContentID, Link, addonid, SettingPageID, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeType, NewWindow, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
+                            s = s & GetNode(cp, env, CollectionID, ContentControlID, helpCollectionID, HelpAddonID, ContentID, Link, addonid, SettingPageID, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeType, NewWindow, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
                             Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                             Call csChildList.GoNext()
                         Loop While csChildList.OK
