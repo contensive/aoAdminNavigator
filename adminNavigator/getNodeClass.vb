@@ -282,278 +282,228 @@ Namespace Contensive.adminNavigator
                             ' List all add-ons
                             ' List all CDef
                             ' Add Collection Help
+                            ' Add Layouts associated with collection
                             '
+                            Dim nodeHtml As String = ""
+                            Dim cacheName As String
                             CollectionID = 0
                             If UBound(parentNodeStack) > 0 Then
                                 CollectionID = cp.Utils.EncodeInteger(parentNodeStack(1))
                             End If
-                            '
-                            ' Help Icon
-                            '
-                            Name = "Help"
-                            NodeIDString = ""
-                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                            s = s & GetNode(cp, env, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
-                            's = s & GetNavigatorNode(cp, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS,"")
-                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                            '
-                            ' List out add-ons in this collection
-                            '
-                            NodeIDString = ""
-                            FieldList = "*"
-                            'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
-                            Criteria = "(collectionid=" & CollectionID & ")"
-                            If Not env.isDeveloper Then
-                                Criteria = Criteria & "and(admin<>0)"
-                                'Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
-                            End If
-                            Dim cs4 As CPCSBaseClass = cp.CSNew()
-                            If cs4.Open("add-ons", Criteria, "name", , FieldList) Then
-                                Do
-                                    Name = Trim(cs4.GetText("name"))
-                                    NameSuffix = ""
-                                    linkSuffixList = ""
-                                    If env.isDeveloper Then
-                                        linkSuffixList &= "<a href=""" & env.addonEditAddonUrlPrefix & cs4.GetInteger("id") & """>edit</a>"
-                                        If Not cs4.GetBoolean("admin") Then
-                                            linkSuffixList &= ",dev"
-                                        End If
-                                        linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
-                                        'If cs4.GetBoolean("content") Then
-                                        '    NameSuffix = NameSuffix & "c"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("template") Then
-                                        '    NameSuffix = NameSuffix & "t"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        ''Name = Name & "(" & NameSuffix & ")"
-                                        'If cs4.GetBoolean("email") Then
-                                        '    NameSuffix = NameSuffix & "m"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("admin") Then
-                                        '    NameSuffix = NameSuffix & "n"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("remotemethod") Then
-                                        '    NameSuffix = NameSuffix & "r"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("onpagestartevent") Then
-                                        '    NameSuffix = NameSuffix & "b"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("onpageendevent") Then
-                                        '    NameSuffix = NameSuffix & "a"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("onbodystart") Then
-                                        '    NameSuffix = NameSuffix & "s"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'If cs4.GetBoolean("onpageendevent") Then
-                                        '    NameSuffix = NameSuffix & "e"
-                                        'Else
-                                        '    NameSuffix = NameSuffix & "-"
-                                        'End If
-                                        'Name = Name & " (" & NameSuffix & ")"
-                                    End If
-                                    addonid = cs4.GetInteger("ID")
-                                    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                                    ContentControlID = cs4.GetInteger("ContentControlID")
-                                    Select Case cs4.GetInteger("navtypeid")
-                                        Case 2
-                                            NavIconType = NavIconTypeReport
-                                        Case 3
-                                            NavIconType = NavIconTypeSetting
-                                        Case 4
-                                            NavIconType = NavIconTypeTool
-                                        Case Else
-                                            NavIconType = NavIconTypeAddon
-                                    End Select
-                                    s = s & GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
-                                    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                    Call cs4.GoNext()
-                                Loop While cs4.OK
-                            End If
-                            Call cs4.Close()
-
-                            'CS = Main.openCSContent("Add-ons", Criteria, , , , , FieldList)
-                            'Do While Main.iscsok(CS)
-                            '    Name = Trim(csx.getText( "name"))
-                            '    NameSuffix = ""
-                            '    If isDeveloper Then
-                            '        If csx.getBoolean( "content") Then
-                            '            NameSuffix = NameSuffix & "c"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "template") Then
-                            '            NameSuffix = NameSuffix & "t"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        'Name = Name & "(" & NameSuffix & ")"
-                            '        If csx.getBoolean( "email") Then
-                            '            NameSuffix = NameSuffix & "m"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "admin") Then
-                            '            NameSuffix = NameSuffix & "n"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "remotemethod") Then
-                            '            NameSuffix = NameSuffix & "r"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "onpagestartevent") Then
-                            '            NameSuffix = NameSuffix & "b"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "onpageendevent") Then
-                            '            NameSuffix = NameSuffix & "a"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "onbodystart") Then
-                            '            NameSuffix = NameSuffix & "s"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        If csx.getBoolean( "onpageendevent") Then
-                            '            NameSuffix = NameSuffix & "e"
-                            '        Else
-                            '            NameSuffix = NameSuffix & "-"
-                            '        End If
-                            '        Name = Name & " (" & NameSuffix & ")"
-                            '    End If
-                            '    addonid = csx.getInteger( "ID")
-                            '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                            '    ContentControlID = csx.getInteger( "ContentControlID")
-                            '    Select Case csx.getInteger( "navtypeid")
-                            '        Case 2
-                            '            NavIconType = NavIconTypeReport
-                            '        Case 3
-                            '            NavIconType = NavIconTypeSetting
-                            '        Case 4
-                            '            NavIconType = NavIconTypeTool
-                            '        Case Else
-                            '            NavIconType = NavIconTypeAddon
-                            '    End Select
-                            '    s = s & GetNavigatorNode(0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS,"")
-                            '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                            '    Call Main.NextCSRecord(CS)
-                            'Loop
-                            'Call Main.closeCs(CS)
-                            '
-                            ' List out cdefs connected to this collection
-                            '
-                            NodeIDString = ""
-                            Criteria = "(collectionid=" & CollectionID & ")"
-                            If env.isDeveloper Then
-                            ElseIf cp.User.IsAdmin Then
-                                Criteria = Criteria & "and(developeronly=0)"
-                            Else
-                                Criteria = Criteria & "and(developeronly=0)and(adminonly=0)"
-                            End If
-                            Dim LastContentID As Integer
-                            Dim DupsFound As Boolean
-                            LastContentID = -1
-                            DupsFound = False
-                            SQL = "select c.id,c.name,c.contentcontrolid,c.developeronly,c.adminonly from ccContent c left join ccAddonCollectionCDefRules r on r.contentid=c.id where " & Criteria & " order by c.name"
-                            Dim cs7 As CPCSBaseClass = cp.CSNew()
-                            If cs7.OpenSQL(SQL) Then
-                                Do
-                                    Name = Trim(cs7.GetText("name"))
-                                    ContentID = cs7.GetInteger("id")
-                                    If ContentID = LastContentID Then
-                                        DupsFound = True
-                                    Else
+                            cacheName = "addonNav." & NodeIDManageAddonsCollectionPrefix & "." & CollectionID & "." & cp.User.Id.ToString
+                            nodeHtml = cp.Cache.Read(cacheName)
+                            If nodeHtml = "" Then
+                                '
+                                ' Help Icon
+                                '
+                                Name = "Help"
+                                NodeIDString = ""
+                                NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                                nodeHtml &= GetNode(cp, env, 0, 0, CollectionID, 0, 0, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeHelp, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
+                                Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                '
+                                ' List out add-ons in this collection
+                                '
+                                NodeIDString = ""
+                                FieldList = "*"
+                                'FieldList = "Name,id as collectionid,0 as ID,0 as AddonID,0 as NewWindow,0 as ContentID,'' as LinkPage," & NavIconTypeFolder & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid"
+                                Criteria = "(collectionid=" & CollectionID & ")"
+                                If Not env.isDeveloper Then
+                                    Criteria = Criteria & "and(admin<>0)"
+                                    'Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
+                                End If
+                                Dim cs4 As CPCSBaseClass = cp.CSNew()
+                                If cs4.Open("add-ons", Criteria, "name", , FieldList) Then
+                                    Do
+                                        Name = Trim(cs4.GetText("name"))
+                                        NameSuffix = ""
                                         linkSuffixList = ""
                                         If env.isDeveloper Then
-                                            linkSuffixList = "<a href=""" & env.contentFieldEditToolPrefix & ContentID & """>edit</a>"
-                                            If cs7.GetBoolean("developeronly") Then
+                                            linkSuffixList &= "<a href=""" & env.addonEditAddonUrlPrefix & cs4.GetInteger("id") & """>edit</a>"
+                                            If Not cs4.GetBoolean("admin") Then
                                                 linkSuffixList &= ",dev"
-                                            ElseIf cs7.GetBoolean("adminonly") Then
-                                                linkSuffixList &= ",adm"
                                             End If
-                                            If Not String.IsNullOrEmpty(linkSuffixList) Then
-                                                linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
+                                            linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
+                                            'If cs4.GetBoolean("content") Then
+                                            '    NameSuffix = NameSuffix & "c"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("template") Then
+                                            '    NameSuffix = NameSuffix & "t"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            ''Name = Name & "(" & NameSuffix & ")"
+                                            'If cs4.GetBoolean("email") Then
+                                            '    NameSuffix = NameSuffix & "m"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("admin") Then
+                                            '    NameSuffix = NameSuffix & "n"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("remotemethod") Then
+                                            '    NameSuffix = NameSuffix & "r"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("onpagestartevent") Then
+                                            '    NameSuffix = NameSuffix & "b"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("onpageendevent") Then
+                                            '    NameSuffix = NameSuffix & "a"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("onbodystart") Then
+                                            '    NameSuffix = NameSuffix & "s"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'If cs4.GetBoolean("onpageendevent") Then
+                                            '    NameSuffix = NameSuffix & "e"
+                                            'Else
+                                            '    NameSuffix = NameSuffix & "-"
+                                            'End If
+                                            'Name = Name & " (" & NameSuffix & ")"
+                                        End If
+                                        addonid = cs4.GetInteger("ID")
+                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                        ContentControlID = cs4.GetInteger("ContentControlID")
+                                        Select Case cs4.GetInteger("navtypeid")
+                                            Case 2
+                                                NavIconType = NavIconTypeReport
+                                            Case 3
+                                                NavIconType = NavIconTypeSetting
+                                            Case 4
+                                                NavIconType = NavIconTypeTool
+                                            Case Else
+                                                NavIconType = NavIconTypeAddon
+                                        End Select
+                                        nodeHtml &= GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
+                                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                        Call cs4.GoNext()
+                                    Loop While cs4.OK
+                                End If
+                                Call cs4.Close()
+                                '
+                                ' List out cdefs connected to this collection
+                                '
+                                NodeIDString = ""
+                                Criteria = "(collectionid=" & CollectionID & ")"
+                                If env.isDeveloper Then
+                                ElseIf cp.User.IsAdmin Then
+                                    Criteria = Criteria & "and(developeronly=0)"
+                                Else
+                                    Criteria = Criteria & "and(developeronly=0)and(adminonly=0)"
+                                End If
+                                Dim LastContentID As Integer
+                                Dim DupsFound As Boolean
+                                LastContentID = -1
+                                DupsFound = False
+                                SQL = "select c.id,c.name,c.contentcontrolid,c.developeronly,c.adminonly from ccContent c left join ccAddonCollectionCDefRules r on r.contentid=c.id where " & Criteria & " order by c.name"
+                                Dim cs7 As CPCSBaseClass = cp.CSNew()
+                                If cs7.OpenSQL(SQL) Then
+                                    Do
+                                        Name = Trim(cs7.GetText("name"))
+                                        ContentID = cs7.GetInteger("id")
+                                        If ContentID = LastContentID Then
+                                            DupsFound = True
+                                        Else
+                                            linkSuffixList = ""
+                                            If env.isDeveloper Then
+                                                linkSuffixList = "<a href=""" & env.contentFieldEditToolPrefix & ContentID & """>edit</a>"
+                                                If cs7.GetBoolean("developeronly") Then
+                                                    linkSuffixList &= ",dev"
+                                                ElseIf cs7.GetBoolean("adminonly") Then
+                                                    linkSuffixList &= ",adm"
+                                                End If
+                                                If Not String.IsNullOrEmpty(linkSuffixList) Then
+                                                    linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
+                                                End If
+                                            End If
+                                            NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
+                                            ContentControlID = cs7.GetInteger("ContentControlID")
+                                            NameSuffix = ""
+                                            nodeHtml &= GetNode(cp, env, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
+                                            Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                                        End If
+                                        LastContentID = ContentID
+                                        Call cs7.GoNext()
+                                    Loop While cs7.OK()
+                                End If
+                                Call cs7.Close()
+                                '
+                                ' list all data records associated to this collection
+                                '
+                                Dim dataRecordList As String = ""
+                                Dim dataRecords As New List(Of String)
+                                Dim dataRecordParts As String()
+                                'Dim dataRecordId As Integer
+                                'Dim dataRecordGuid As String
+                                Dim dataRecordName As String
+                                Dim dataRecordCdefName As String
+                                Dim dataRecordCdefID As Integer
+                                Dim sqlCriteria As String = ""
+
+                                If cs7.Open("add-on collections", "id=" & CollectionID) Then
+                                    dataRecordList = cs7.GetText("dataRecordList")
+                                End If
+                                Call cs7.Close()
+                                If Not String.IsNullOrEmpty(dataRecordList) Then
+                                    dataRecords.AddRange(dataRecordList.Split(vbCrLf.ToCharArray))
+                                    For Each dataRecord As String In dataRecords
+                                        dataRecordParts = dataRecord.Split(",".ToCharArray)
+                                        dataRecordCdefName = dataRecordParts(0)
+                                        If Not String.IsNullOrEmpty(dataRecordCdefName) Then
+                                            dataRecordCdefID = cp.Content.GetID(dataRecordCdefName)
+                                            If dataRecordCdefID <> 0 Then
+                                                sqlCriteria = ""
+                                                If dataRecordParts.Length >= 2 Then
+                                                    ' 
+                                                    ' contentname,(id or guid)
+                                                    '
+                                                    If dataRecordParts(1).Substring(0, 1) = "{" Then
+                                                        sqlCriteria = "ccguid=" & cp.Db.EncodeSQLText(dataRecordParts(1))
+                                                    Else
+                                                        sqlCriteria = "name=" & cp.Db.EncodeSQLText(dataRecordParts(1))
+                                                    End If
+                                                End If
+                                                If cs7.Open(dataRecordCdefName, sqlCriteria) Then
+                                                    Do
+                                                        dataRecordName = cs7.GetText("name")
+
+
+                                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Edit '" & dataRecordName & "' in '" & dataRecordCdefName & "'")
+                                                        IconNoSubNodes = IconRecord
+                                                        IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
+                                                        Link = "?id=" & cs7.GetInteger("id").ToString & "&cid=" & dataRecordCdefID.ToString & "&af=4"
+                                                        ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
+                                                        nodeHtml &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & dataRecordCdefName & ":" & dataRecordName & "</a></div>"
+                                                        'nodeHtml &= GetNode(cp, env, 0, 0, 0, 0, 0, "/admin?af=4&cid=" & dataRecordCdefID.ToString & "&id=" & cs7.GetInteger("id"), 0, 0, dataRecordCdefName & ":" & cs7.GetText("name"), LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, "Data", AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
+                                                        Call cs7.GoNext()
+                                                    Loop While cs7.OK
+
+                                                End If
+                                                Call cs7.Close()
                                             End If
                                         End If
-                                        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                                        ContentControlID = cs7.GetInteger("ContentControlID")
-                                        NameSuffix = ""
-                                        'If env.isDeveloper Then
-                                        '    If cs7.GetBoolean("developeronly") Then
-                                        '        NameSuffix = NameSuffix & "--"
-                                        '    Else
-                                        '        If cs7.GetBoolean("adminonly") Then
-                                        '            NameSuffix = NameSuffix & "-a"
-                                        '        Else
-                                        '            NameSuffix = NameSuffix & "ca"
-                                        '        End If
-                                        '    End If
-
-                                        '    Name = Name & " (" & NameSuffix & ")"
-                                        'End If
-                                        s = s & GetNode(cp, env, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
-                                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                                    End If
-                                    LastContentID = ContentID
-                                    Call cs7.GoNext()
-                                Loop While cs7.OK()
+                                    Next
+                                End If
+                                '
+                                If DupsFound Then
+                                    SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
+                                    SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
+                                    Call cp.Db.ExecuteSQL(SQL)
+                                End If
+                                Call cp.Cache.Save(cacheName, nodeHtml, "add-on collections,add-ons", Now.AddHours(1))
                             End If
-                            Call cs7.Close()
-                            '
-                            'CS = Main.OpenCSSQL("default", SQL)
-                            'Do While Main.iscsok(CS)
-                            '    Name = Trim(csx.getText("name"))
-                            '    ContentID = csx.getInteger("id")
-                            '    If ContentID = LastContentID Then
-                            '        DupsFound = True
-                            '    Else
-                            '        NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name)
-                            '        ContentControlID = csx.getInteger("ContentControlID")
-                            '        NameSuffix = ""
-                            '        If isDeveloper Then
-                            '            If csx.getBoolean("developeronly") Then
-                            '                NameSuffix = NameSuffix & "--"
-                            '            Else
-                            '                If csx.getBoolean("adminonly") Then
-                            '                    NameSuffix = NameSuffix & "-a"
-                            '                Else
-                            '                    NameSuffix = NameSuffix & "ca"
-                            '                End If
-                            '            End If
-
-                            '            Name = Name & " (" & NameSuffix & ")"
-                            '        End If
-                            '        s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeContent, False, True, OpenNodeList, NodeIDString, NodeNavigatorJS,"")
-                            '        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                            '    End If
-                            '    LastContentID = ContentID
-                            '    Call Main.NextCSRecord(CS)
-                            'Loop
-                            'Call Main.closeCs(CS)
-                            If DupsFound Then
-                                SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
-                                SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
-                                Call cp.Db.ExecuteSQL(SQL)
-                            End If
+                            s &= nodeHtml
                         Case NodeIDManageAddonsAdvanced
                             '
                             ' Special Case: clicked on Manage Add-ons.advanced
