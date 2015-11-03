@@ -596,7 +596,7 @@ Namespace Contensive.adminNavigator
                             ' special case: all content
                             '
                             FieldList = "Name,ID,0 as AddonID,0 as NewWindow,ID as ContentID,'' as LinkPage," & NavIconTypeContent & " as NavIconType,Name as NavIconTitle,0 as SettingPageID,0 as HelpAddonID,0 as HelpCollectionID,0 as contentcontrolid,0 as collectionid"
-                            Call csChildList.Open("content", , "name", , FieldList)
+                            Call csChildList.Open("content", , "name", , FieldList, 999)
                             'CS = Main.openCSContent("Content", , , , , , FieldList)
                             NodeType = NodeTypeEnum.NodeTypeContent
                             BlockSubNodes = True
