@@ -42,7 +42,7 @@ Namespace Contensive.adminNavigator
                 Dim ParentNode As String
                 Dim OpenNodeList As String
                 Dim NavigatorJS As String = ""
-                Dim env As navigatorEnvironment
+                Dim env As New navigatorEnvironment
                 '
                 ' arguments
                 '
