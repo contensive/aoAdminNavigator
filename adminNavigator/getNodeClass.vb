@@ -231,7 +231,7 @@ Namespace Contensive.adminNavigator
                             Dim cs3 As CPCSBaseClass = cp.CSNew()
                             NodeType = NodeTypeEnum.NodeTypeCollection
                             BlockSubNodes = False
-                            If cs3.Open("Add-on Collections", Criteria, "name", , FieldList) Then
+                            If cs3.Open("Add-on Collections", Criteria, "name", , FieldList, 9999, 1) Then
                                 Do
                                     Name = Trim(cs3.GetText("name"))
                                     NavIconTitle = Name
