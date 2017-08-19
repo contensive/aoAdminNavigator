@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Collection name="Admin Navigator" guid="{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}" system="Yes" updatable="Yes" blockNavigatorNode="No">
+	<HelpLink></HelpLink>
+	<Help></Help>
+	<Addon name="Admin Navigator" guid="{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.adminNavigator.GetFullClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>Yes</BlockEditTools>
+		<FormXML></FormXML>
+		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead><![CDATA[//
+//----------
+// Open and close click methods for admin nav ajax menu
+//----------
+//
+function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmptyHide) {
+		document.getElementById(OffNode).style.display='none';
+		document.getElementById(OnNode).style.display='block';
+		var e=document.getElementById(ContentNode);
+		if(e.ok) {//already populated
+			cj.ajax.addon('AdminNavigatorOpenNode','nodeid='+NodeID)
+		}else{
+			e.ok='ok';
+			cj.ajax.addon('AdminNavigatorGetNode','nodeid='+NodeID,'',ContentNode,onEmptyHide,onEmptyShow)
+		}
+		e.style.display='block';
+}
+function AdminNavCloseClick(OffNode,OnNode,ContentNode,NodeID,EmptyNode) {
+		document.getElementById(OffNode).style.display='none';
+		document.getElementById(OnNode).style.display='block';
+		document.getElementById(ContentNode).style.display='none';
+		cj.ajax.addon('AdminNavigatorCloseNode','nodeid='+NodeID);
+}
+]]></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription><![CDATA[Contensive.adminNavigator.GetFullClass
+aoAdminNavigator.GetFullClass]]></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>No</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles><![CDATA[.ccCon .ccToolsCon .ccContentCon {
+    min-height: 100vh;
+}]]></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="0"/>
+	</Addon>
+	<Addon name="AdminNavigatorCloseNode" guid="{F466E4E3-807B-48A4-9AFD-3AC67065BC34}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="VBScript" EntryPoint="closeNode" Timeout="0">
+			<Code><![CDATA[Function closeNode
+		Dim NodeIDString
+		Dim OpenNodeList
+		NodeIDString = cp.doc.getText("nodeid")
+		'NodeIDString = ccLib.getStreamText("nodeid")
+		If NodeIDString <> "" Then
+			OpenNodeList = cp.visit.getProperty("AdminNavOpenNodeList")
+			If OpenNodeList <> "" Then
+				OpenNodeList = Replace(OpenNodeList & ",", "," & NodeIDString & ",", ",",1,99,1)
+				OpenNodeList = Mid(OpenNodeList, 1, Len(OpenNodeList) - 1)
+			End If
+			Call cp.visit.setProperty("AdminNavOpenNodeList", OpenNodeList)
+		End If
+End Function]]></Code>
+		</Scripting>
+	</Addon>
+	<Addon name="AdminNavigatorGetNode" guid="{2CC46760-D008-4413-B2B2-2EA9CE8BC6E9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass><![CDATA[Contensive.adminNavigator.GetNodeClass]]></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="" EntryPoint="" Timeout="0"/>
+	</Addon>
+	<Addon name="AdminNavigatorOpenNode" guid="{236D0E88-A1DC-4289-A678-35261307AFA9}" type="Add-on">
+		<Copy></Copy>
+		<CopyText></CopyText>
+		<ActiveXProgramID></ActiveXProgramID>
+		<DotNetClass></DotNetClass>
+		<ArgumentList></ArgumentList>
+		<AsAjax>No</AsAjax>
+		<Filter>No</Filter>
+		<Help></Help>
+		<HelpLink></HelpLink>
+		<Icon Link="" width="0" height="0" sprites="0" />
+		<InIframe>No</InIframe>
+		<BlockEditTools>No</BlockEditTools>
+		<FormXML></FormXML>
+		<IsInline>No</IsInline>
+		<JavascriptOnLoad></JavascriptOnLoad>
+		<JavascriptInHead></JavascriptInHead>
+		<JavascriptBodyEnd></JavascriptBodyEnd>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
+		<Content>No</Content>
+		<Template>No</Template>
+		<Email>No</Email>
+		<Admin>No</Admin>
+		<OnPageEndEvent>No</OnPageEndEvent>
+		<OnPageStartEvent>No</OnPageStartEvent>
+		<OnBodyStart>No</OnBodyStart>
+		<OnBodyEnd>No</OnBodyEnd>
+		<RemoteMethod>Yes</RemoteMethod>
+		<ProcessRunOnce>No</ProcessRunOnce>
+		<ProcessInterval>0</ProcessInterval>
+		<PageTitle></PageTitle>
+		<RemoteAssetLink></RemoteAssetLink>
+		<Styles></Styles>
+		<Scripting Language="VBScript" EntryPoint="openNode" Timeout="0">
+			<Code><![CDATA[Function openNode
+		Dim NodeIDString
+		Dim OpenNodeList
+		' NodeIDString = cp.doc.var("nodeid")
+		NodeIDString = ccLib.getStreamText("nodeid")
+		if NodeIDString<>"" then
+			OpenNodeList = cp.visit.getProperty("AdminNavOpenNodeList", "")
+			OpenNodeList = OpenNodeList & "," & NodeIDString
+			Call cp.visit.setProperty("AdminNavOpenNodeList", OpenNodeList)
+		End If
+End Function]]></Code>
+		</Scripting>
+	</Addon>
+	<ImportCollection name="JQuery UI">{1D3B0D90-5C61-449F-B1AF-47688C5E97D1}</ImportCollection>
+	<Resource name="adminnavigator.dll" type="executable" path="" />
+</Collection>
