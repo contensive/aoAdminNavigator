@@ -190,8 +190,8 @@ End Function]]></Code>
 			<Code><![CDATA[Function openNode
 		Dim NodeIDString
 		Dim OpenNodeList
-		' NodeIDString = cp.doc.var("nodeid")
-		NodeIDString = ccLib.getStreamText("nodeid")
+		NodeIDString = cp.doc.getInteger("nodeid")
+		'NodeIDString = ccLib.getStreamText("nodeid")
 		if NodeIDString<>"" then
 			OpenNodeList = cp.visit.getProperty("AdminNavOpenNodeList", "")
 			OpenNodeList = OpenNodeList & "," & NodeIDString
@@ -200,6 +200,6 @@ End Function]]></Code>
 End Function]]></Code>
 		</Scripting>
 	</Addon>
-	<ImportCollection name="JQuery UI">{1D3B0D90-5C61-449F-B1AF-47688C5E97D1}</ImportCollection>
+	<ImportCollection name="jQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
 	<Resource name="adminnavigator.dll" type="executable" path="" />
 </Collection>
