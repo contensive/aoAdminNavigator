@@ -8,17 +8,8 @@ Imports System.Text
 Imports Contensive.BaseClasses
 
 Namespace Contensive.adminNavigator
-    '
-    ' Sample Vb addon
-    '
     Public Class getNodeClass
         Inherits AddonBaseClass
-        '
-        ' - update references to your installed version of cpBase
-        ' - Edit project - under application, verify root name space is empty
-        ' - Change the namespace in this file to the collection name
-        ' - Change this class name to the addon name
-        ' - Create a Contensive Addon record, set the dotnet class full name to yourNameSpaceName.yourClassName
         '
         Public Structure navigatorEnvironment
             Public adminUrl As String
@@ -28,28 +19,17 @@ Namespace Contensive.adminNavigator
             Public addonEditCollectionUrlPrefix As String
             Public contentFieldEditToolPrefix As String
         End Structure
-        '
-        '=====================================================================================
-        ' addon api
-        '   returns html for the navigator under a specific node
-        '   arguments
-        '       nodeId - the parent id of the list to be created
-        '=====================================================================================
-        '
+        ''' <summary>
+        ''' Return the full navigator
+        ''' </summary>
+        ''' <param name="CP"></param>
+        ''' <returns></returns>
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                Dim ParentNode As String
-                Dim OpenNodeList As String
-                Dim NavigatorJS As String = ""
-                Dim env As New navigatorEnvironment
-                '
-                ' arguments
-                '
-                ParentNode = CP.Doc.GetText("nodeid")
                 '
                 ' setup environment
-                '
+                Dim env As New navigatorEnvironment
                 env.adminUrl = CP.Site.GetText("adminurl")
                 env.buildVersion = CP.Site.GetProperty("buildversion")
                 env.isDeveloper = CP.User.IsDeveloper()
@@ -59,7 +39,8 @@ Namespace Contensive.adminNavigator
                     env.contentFieldEditToolPrefix = env.adminUrl & "?af=105&contentid="
                 End If
                 '
-                OpenNodeList = CP.Visit.GetText("AdminNavOpenNodeList")
+                Dim OpenNodeList As String = CP.Visit.GetText("AdminNavOpenNodeList")
+                Dim ParentNode As String = CP.Doc.GetText("nodeid")
                 If (ParentNode <> "") Then
                     If OpenNodeList = "" Then
                         OpenNodeList = "," & ParentNode
@@ -72,9 +53,10 @@ Namespace Contensive.adminNavigator
                     End If
                 End If
 
+                Dim NavigatorJS As String = ""
                 returnHtml = GetNodeList(CP, env, ParentNode, OpenNodeList, NavigatorJS)
                 If NavigatorJS <> "" Then
-                    NavigatorJS = "" _
+                    NavigatorJS = "if(jQuery" _
                         & "if(window.navDrop) {" _
                         & NavigatorJS _
                         & "};"
@@ -85,61 +67,23 @@ Namespace Contensive.adminNavigator
             End Try
             Return returnHtml
         End Function
-        '
-        '
-        '
+        ''' <summary>
+        ''' get Node list?
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="env"></param>
+        ''' <param name="ParentNode"></param>
+        ''' <param name="OpenNodeList"></param>
+        ''' <param name="Return_NavigatorJS"></param>
+        ''' <returns></returns>
         Friend Function GetNodeList(cp As CPBaseClass, env As navigatorEnvironment, ParentNode As String, OpenNodeList As String, ByRef Return_NavigatorJS As String) As String
             Dim returnNav As String = ""
             Try
                 Const AutoManageAddons = True
-                '
-                Dim NodeNavigatorJS As String
-                Dim ATag As String
                 Dim Index As New keyPtrIndexClass
-                Dim NameSuffix As String
-                Dim SettingPageID As Integer
-                Dim FieldList As String
-                Dim BakeName As String
-                Dim NodeIDString As String
-                Dim IconNoSubNodes As String
-                Dim IconClosed As String
-                Dim NavigatorID As Integer
-                Dim SQL As String
-                Dim CollectionID As Integer
-                Dim CS As Integer
-                Dim s As String
-                Dim Name As String
-                Dim NewWindow As Boolean
-                Dim ContentID As Integer
-                Dim HelpAddonID As Integer
-                Dim helpCollectionID As Integer
-                Dim addonid As Integer
-                Dim Link As String
-                Dim Criteria As String
-                Dim BlockSubNodes As Boolean
-                Dim TopParentNode As String
-                Dim parentNodeStack() As String
-                Dim NodeType As NodeTypeEnum
-                Dim ContentName As String
-                Dim Ptr As Integer
-                Dim RecordName As String
-                Dim NavIconType As Integer
-                Dim NavIconTitle As String
-                Dim NavIconTitleHtmlEncoded As String
-                Dim EmptyNodeList As String
-                Dim EmptyNodeListInitial As String
-                Dim LegacyMenuControlID As Integer
-                Dim ContentControlID As Integer
-                Dim cs2 As CPCSBaseClass = cp.CSNew()
-                Dim csChildList As CPCSBaseClass = cp.CSNew()
-                Dim linkSuffixList As String
                 '
-                If env.buildVersion < "3.4.175" Then
-                    returnNav = "Upgrade your site Database to support this feature."
-                Else
-                    '
-                    ' get emptyNodeList - list of empty nodes 
-                    '
+                If True Then
+                    Dim BakeName As String
                     If env.isDeveloper Then
                         BakeName = "AdminNav EmptyNodeList Dev"
                     ElseIf cp.User.IsAdmin() Then
@@ -147,11 +91,13 @@ Namespace Contensive.adminNavigator
                     Else
                         BakeName = "AdminNav EmptyNodeList CM" & cp.User.Id
                     End If
-                    EmptyNodeList = cp.Cache.Read(BakeName)
+                    Dim EmptyNodeList As String = cp.Cache.Read(BakeName)
+                    Dim SQL As String
                     If EmptyNodeList <> "" Then
                         Call cp.Site.TestPoint("adminNavigator, emptyNodeList from cache=[" & EmptyNodeList & "]")
                     Else
                         SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
+                        Dim cs2 As CPCSBaseClass = cp.CSNew()
                         If cs2.OpenSQL(SQL) Then
                             Do
                                 EmptyNodeList &= "," & cs2.GetText("id")
@@ -160,20 +106,12 @@ Namespace Contensive.adminNavigator
                             EmptyNodeList = EmptyNodeList.Substring(1)
                         End If
                         Call cs2.Close()
-                        ''SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null And n.ContentControlID=" & cp.Content.GetID("Navigator Entries") & " group by n.id"
-                        'RS = Main.executesql("default", SQL)
-                        'If Not (RS Is Nothing) Then
-                        '    If Not RS.EOF Then
-                        '        EmptyNodeList = RS.GetString(adClipString, , "", ",")
-                        '        'EmptyNodeList = Join(temp(0), ",")
-                        '    End If
-                        'End If
-                        'RS = Nothing
                         Call cp.Site.TestPoint("adminNavigator, emptyNodeList from db=[" & EmptyNodeList & "]")
                         Call cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries")
                     End If
-                    EmptyNodeListInitial = EmptyNodeList
-                    TopParentNode = ParentNode
+                    Dim EmptyNodeListInitial As String = EmptyNodeList
+                    Dim TopParentNode As String = ParentNode
+                    Dim parentNodeStack() As String
                     If TopParentNode = "" Then
                         '
                         ' bad call
@@ -186,7 +124,29 @@ Namespace Contensive.adminNavigator
                         '
                         parentNodeStack = Split(TopParentNode, ".")
                     End If
-                    LegacyMenuControlID = cp.Content.GetID("Menu Entries")
+                    Dim LegacyMenuControlID As Integer = cp.Content.GetID("Menu Entries")
+                    '
+                    Dim NodeNavigatorJS As String
+                    Dim ATag As String
+                    Dim FieldList As String
+                    Dim NodeIDString As String
+                    Dim IconNoSubNodes As String
+                    Dim NavigatorID As Integer
+                    Dim CollectionID As Integer
+                    Dim s As String
+                    Dim Name As String
+                    Dim ContentID As Integer
+                    Dim addonid As Integer
+                    Dim Link As String
+                    Dim Criteria As String
+                    Dim BlockSubNodes As Boolean
+                    Dim NodeType As NodeTypeEnum
+                    Dim NavIconType As Integer
+                    Dim NavIconTitle As String
+                    Dim NavIconTitleHtmlEncoded As String
+                    Dim ContentControlID As Integer
+                    Dim csChildList As CPCSBaseClass = cp.CSNew()
+                    Dim linkSuffixList As String
                     Select Case parentNodeStack(0)
                         '
                         ' Open CS so:
@@ -313,6 +273,7 @@ Namespace Contensive.adminNavigator
                                     'Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
                                 End If
                                 Dim cs4 As CPCSBaseClass = cp.CSNew()
+                                Dim NameSuffix As String
                                 If cs4.Open("add-ons", Criteria, "name", , FieldList) Then
                                     Do
                                         Name = Trim(cs4.GetText("name"))
@@ -699,7 +660,7 @@ Namespace Contensive.adminNavigator
                             '
                             ' numeric node (default case) - list navigator records with parent=TopParentNode
                             '
-                            CS = -1
+                            Dim CS As Integer = -1
                             If IsNumeric(TopParentNode) Then
                                 If InStr(1, EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
                                     EmptyNodeList = EmptyNodeList
@@ -750,16 +711,16 @@ Namespace Contensive.adminNavigator
                             'End If
                             If ContentID <> 0 Then
                                 ContentID = ContentID
-                                ContentName = cp.Content.GetRecordName("content", ContentID)
+                                Dim ContentName As String = cp.Content.GetRecordName("content", ContentID)
                                 If ContentName <> "" Then
                                     'ContentTableName =cp.Content.GetTable(ContentName)
                                     csChildList.Close()
-                                    Ptr = 0
+                                    Dim Ptr As Integer = 0
                                     If csChildList.Open(ContentName, , "name", , "ID,Name,ContentControlID", 20, 1) Then
                                         EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
                                         Do
                                             NavigatorID = csChildList.GetInteger("ID")
-                                            RecordName = csChildList.GetText("Name")
+                                            Dim RecordName As String = csChildList.GetText("Name")
                                             If RecordName = "" Then
                                                 RecordName = "Record " & NavigatorID
                                             End If
@@ -779,6 +740,7 @@ Namespace Contensive.adminNavigator
                                         If Ptr = 20 Then
                                             NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML("Open All '" & NavigatorContentName & "'")
                                             Link = "?cid=" & ContentID
+                                            Dim IconClosed As String
                                             s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconClosed & "&nbsp;<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>more...</a></div>"
                                         End If
                                     End If
@@ -825,17 +787,17 @@ Namespace Contensive.adminNavigator
                             CollectionID = csChildList.GetInteger("CollectionID")
                             NavigatorID = csChildList.GetInteger("ID")
                             Name = Trim(csChildList.GetText("name"))
-                            NewWindow = csChildList.GetBoolean("newwindow")
+                            Dim NewWindow As Boolean = csChildList.GetBoolean("newwindow")
                             ContentID = csChildList.GetInteger("ContentID")
                             Link = Trim(csChildList.GetText("LinkPage"))
                             addonid = csChildList.GetInteger("AddonID")
                             NavIconType = csChildList.GetInteger("NavIconType")
                             NavIconTitle = csChildList.GetText("NavIconTitle")
-                            HelpAddonID = csChildList.GetInteger("HelpAddonID")
+                            Dim HelpAddonID As Integer = csChildList.GetInteger("HelpAddonID")
                             If HelpAddonID <> 0 Then
                                 HelpAddonID = HelpAddonID
                             End If
-                            helpCollectionID = csChildList.GetInteger("HelpCollectionID")
+                            Dim helpCollectionID As Integer = csChildList.GetInteger("HelpCollectionID")
                             If NavIconTitle = "" Then
                                 NavIconTitle = Name
                             End If
@@ -856,6 +818,7 @@ Namespace Contensive.adminNavigator
                                 End If
                             End If
                             NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
+                            Dim SettingPageID As Integer
                             s = s & GetNode(cp, env, CollectionID, ContentControlID, helpCollectionID, HelpAddonID, ContentID, Link, addonid, SettingPageID, Name, LegacyMenuControlID, EmptyNodeList, NavigatorID, NavIconType, NavIconTitleHtmlEncoded, AutoManageAddons, NodeType, NewWindow, BlockSubNodes, OpenNodeList, NodeIDString, NodeNavigatorJS, linkSuffixList)
                             Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                             Call csChildList.GoNext()
