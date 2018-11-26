@@ -1,6 +1,9 @@
 ﻿
 Namespace Contensive.adminNavigator
     Module common
+        '
+        Public Const iconCloseWindow As String = "<i title=close class=""fas fa-window-close"" style=""color:#fff""></i>"
+        Public Const iconOpenWindow As String = "<i title=open class=""fa fa-angle-double-right"" style=""color:#fff""></i>"
 
         '
         '

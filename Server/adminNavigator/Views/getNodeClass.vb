@@ -56,11 +56,8 @@ Namespace Contensive.adminNavigator
                 Dim NavigatorJS As String = ""
                 returnHtml = GetNodeList(CP, env, ParentNode, OpenNodeList, NavigatorJS)
                 If NavigatorJS <> "" Then
-                    NavigatorJS = "if(jQuery" _
-                        & "if(window.navDrop) {" _
-                        & NavigatorJS _
-                        & "};"
-                    Call CP.Doc.AddHeadJavascript(NavigatorJS)
+                    NavigatorJS = "/* block if no dashboard js */if(window.navDrop) {" & NavigatorJS & "};"
+                    Call CP.Doc.AddBodyEnd("<script language=""javascript"" type=""text/javascript/"">jQuery(document).ready(function(){" & NavigatorJS & "})</script>")
                 End If
             Catch ex As Exception
                 HandleError(CP, ex)
@@ -1042,7 +1039,6 @@ Namespace Contensive.adminNavigator
             Dim collectionHelpLink As String
             Dim collectionHelp As String
             Dim NodeNavigatorJS As String
-            Dim NavLinkHTMLId As String
             Dim SubNav As String
             Dim DivIDClosed As String
             Dim DivIDOpened As String
@@ -1210,6 +1206,7 @@ Namespace Contensive.adminNavigator
                 If Len(WorkingName) > 53 Then
                     WorkingName = Left(WorkingName, 25) & "..." & Right(WorkingName, 25)
                 End If
+                Dim NavLinkHTMLId As String = ""
                 '
                 ' setup link
                 '
@@ -1217,9 +1214,9 @@ Namespace Contensive.adminNavigator
                     NavLinkHTMLId = "n" & NavigatorID
                     workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                     If NewWindow Then
-                        workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""Open '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
+                        workingNameHtmlEncoded = "<a class=navDrag name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""Open '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                     Else
-                        workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Open '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
+                        workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Open '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                     End If
                 Else
                     '
@@ -1262,9 +1259,9 @@ Namespace Contensive.adminNavigator
                         NavLinkHTMLId = "a" & addonid
                         workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                         If NewWindow Then
-                            workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
+                            workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                         Else
-                            workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
+                            workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                         End If
                     ElseIf ContentID <> 0 Then
                         '
@@ -1274,9 +1271,9 @@ Namespace Contensive.adminNavigator
                         NavLinkHTMLId = "c" & ContentID
                         workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                         If NewWindow Then
-                            workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""List All '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
+                            workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ target=""_blank"" title=""List All '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
                         Else
-                            workingNameHtmlEncoded = "<a name=""navLink"" id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""List All '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
+                            workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""List All '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
                         End If
                     ElseIf HelpAddonID <> 0 Then
                         '
@@ -1405,18 +1402,16 @@ Namespace Contensive.adminNavigator
                         End If
                     End If
                     If NavLinkHTMLId <> "" Then
-                        Return_NavigatorJS = Return_NavigatorJS _
-                        & cr & "$(function(){" _
-                            & "$('#" & NavLinkHTMLId & "').draggable({" _
-                                & "opacity: 0.50" _
-                                & ",helper: 'clone'" _
-                                & ",revert: 'invalid'" _
-                                & ",stop: function(event, ui){" _
-                                    & "navDrop('" & NavLinkHTMLId & "',ui.position.left,ui.position.top);" _
-                                & "}" _
-                                & ",cursor: 'move'" _
-                            & "});" _
-                        & "});"
+                        'Return_NavigatorJS = Return_NavigatorJS _
+                        '    & "jQuery('#" & NavLinkHTMLId & "').draggable({" _
+                        '        & "opacity: 0.50" _
+                        '        & ",helper: 'clone'" _
+                        '        & ",revert: 'invalid'" _
+                        '        & ",stop: function(event, ui){" _
+                        '            & "navDrop('" & NavLinkHTMLId & "',ui.position.left,ui.position.top);" _
+                        '        & "}" _
+                        '        & ",cursor: 'move'" _
+                        '    & "});"
                     End If
                 End If
             End If

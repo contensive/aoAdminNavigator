@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="windows-1252"?>
-<Collection name="Admin Navigator" guid="{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}" system="Yes" updatable="Yes" blockNavigatorNode="No">
+<Collection name="Admin Navigator" guid="{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}" system="No" updatable="Yes" blockNavigatorNode="No">
 	<HelpLink></HelpLink>
 	<Help></Help>
 	<Addon name="Admin Navigator" guid="{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}" type="Add-on">
@@ -18,35 +18,12 @@
 		<FormXML></FormXML>
 		<IncludeAddon name="JQuery UI" guid="{840B9AEF-9470-4599-BD47-7EC0C9298614}"/>
 		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
-		<JavascriptInHead><![CDATA[//
-//----------
-// Open and close click methods for admin nav ajax menu
-//----------
-//
-function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmptyHide) {
-		document.getElementById(OffNode).style.display='none';
-		document.getElementById(OnNode).style.display='block';
-		var e=document.getElementById(ContentNode);
-		if(e.ok) {//already populated
-			cj.ajax.addon('AdminNavigatorOpenNode','nodeid='+NodeID)
-		}else{
-			e.ok='ok';
-			cj.ajax.addon('AdminNavigatorGetNode','nodeid='+NodeID,'',ContentNode,onEmptyHide,onEmptyShow)
-		}
-		e.style.display='block';
-}
-function AdminNavCloseClick(OffNode,OnNode,ContentNode,NodeID,EmptyNode) {
-		document.getElementById(OffNode).style.display='none';
-		document.getElementById(OnNode).style.display='block';
-		document.getElementById(ContentNode).style.display='none';
-		cj.ajax.addon('AdminNavigatorCloseNode','nodeid='+NodeID);
-}
-]]></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription><![CDATA[Contensive.adminNavigator.GetFullClass
-aoAdminNavigator.GetFullClass]]></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
+		<JavascriptInHead></JavascriptInHead>
+		<javascriptForceHead>No</javascriptForceHead>
+		<JSHeadScriptSrc><![CDATA[/AdminNavigator/AdminNavigator.js]]></JSHeadScriptSrc>
+		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>
+		<!-- deprecated --><JavascriptBodyEnd></JavascriptBodyEnd>
+		<!-- deprecated --><JavascriptOnLoad></JavascriptOnLoad>
 		<Content>No</Content>
 		<Template>No</Template>
 		<Email>No</Email>
@@ -58,12 +35,14 @@ aoAdminNavigator.GetFullClass]]></MetaDescription>
 		<RemoteMethod>No</RemoteMethod>
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
+		<MetaDescription><![CDATA[Contensive.adminNavigator.GetFullClass
+aoAdminNavigator.GetFullClass]]></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
-		<Styles><![CDATA[.ccCon .ccToolsCon .ccContentCon {
-    min-height: 100vh;
-}]]></Styles>
-		<Scripting Language="" EntryPoint="" Timeout="0"/>
+		<Styles></Styles>
+		<styleslinkhref><![CDATA[/AdminNavigator/AdminNavigator.css]]></styleslinkhref>
+		<Scripting Language="VBScript" EntryPoint="" Timeout="0"/>
 	</Addon>
 	<Addon name="AdminNavigatorCloseNode" guid="{F466E4E3-807B-48A4-9AFD-3AC67065BC34}" type="Add-on">
 		<Copy></Copy>
@@ -80,11 +59,12 @@ aoAdminNavigator.GetFullClass]]></MetaDescription>
 		<BlockEditTools>No</BlockEditTools>
 		<FormXML></FormXML>
 		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
+		<javascriptForceHead>No</javascriptForceHead>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>
+		<!-- deprecated --><JavascriptBodyEnd></JavascriptBodyEnd>
+		<!-- deprecated --><JavascriptOnLoad></JavascriptOnLoad>
 		<Content>No</Content>
 		<Template>No</Template>
 		<Email>No</Email>
@@ -96,9 +76,12 @@ aoAdminNavigator.GetFullClass]]></MetaDescription>
 		<RemoteMethod>Yes</RemoteMethod>
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
 		<Styles></Styles>
+		<styleslinkhref></styleslinkhref>
 		<Scripting Language="VBScript" EntryPoint="closeNode" Timeout="0">
 			<Code><![CDATA[Function closeNode
 		Dim NodeIDString
@@ -131,11 +114,12 @@ End Function]]></Code>
 		<BlockEditTools>No</BlockEditTools>
 		<FormXML></FormXML>
 		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
+		<javascriptForceHead>No</javascriptForceHead>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>
+		<!-- deprecated --><JavascriptBodyEnd></JavascriptBodyEnd>
+		<!-- deprecated --><JavascriptOnLoad></JavascriptOnLoad>
 		<Content>No</Content>
 		<Template>No</Template>
 		<Email>No</Email>
@@ -147,10 +131,13 @@ End Function]]></Code>
 		<RemoteMethod>Yes</RemoteMethod>
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
 		<Styles></Styles>
-		<Scripting Language="" EntryPoint="" Timeout="0"/>
+		<styleslinkhref></styleslinkhref>
+		<Scripting Language="VBScript" EntryPoint="" Timeout="0"/>
 	</Addon>
 	<Addon name="AdminNavigatorOpenNode" guid="{236D0E88-A1DC-4289-A678-35261307AFA9}" type="Add-on">
 		<Copy></Copy>
@@ -167,11 +154,12 @@ End Function]]></Code>
 		<BlockEditTools>No</BlockEditTools>
 		<FormXML></FormXML>
 		<IsInline>No</IsInline>
-		<JavascriptOnLoad></JavascriptOnLoad>
 		<JavascriptInHead></JavascriptInHead>
-		<JavascriptBodyEnd></JavascriptBodyEnd>
-		<MetaDescription></MetaDescription>
-		<OtherHeadTags></OtherHeadTags>
+		<javascriptForceHead>No</javascriptForceHead>
+		<JSHeadScriptSrc></JSHeadScriptSrc>
+		<!-- deprecated --><JSBodyScriptSrc></JSBodyScriptSrc>
+		<!-- deprecated --><JavascriptBodyEnd></JavascriptBodyEnd>
+		<!-- deprecated --><JavascriptOnLoad></JavascriptOnLoad>
 		<Content>No</Content>
 		<Template>No</Template>
 		<Email>No</Email>
@@ -183,9 +171,12 @@ End Function]]></Code>
 		<RemoteMethod>Yes</RemoteMethod>
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
+		<MetaDescription></MetaDescription>
+		<OtherHeadTags></OtherHeadTags>
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
 		<Styles></Styles>
+		<styleslinkhref></styleslinkhref>
 		<Scripting Language="VBScript" EntryPoint="openNode" Timeout="0">
 			<Code><![CDATA[Function openNode
 		Dim NodeIDString
@@ -200,6 +191,8 @@ End Function]]></Code>
 End Function]]></Code>
 		</Scripting>
 	</Addon>
-	<ImportCollection name="jQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
-	<Resource name="adminnavigator.dll" type="executable" path="" />
+	<ImportCollection name="JQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
+	<Resource name="AdminNavigator.js" type="www" path="/AdminNavigator" />
+	<Resource name="AdminNavigator.css" type="www" path="/AdminNavigator" />
+	<Resource name="adminNavigator.dll" type="executable" path="" />
 </Collection>
