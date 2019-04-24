@@ -130,7 +130,7 @@ Namespace Contensive.adminNavigator
                     Dim IconNoSubNodes As String
                     Dim NavigatorID As Integer
                     Dim CollectionID As Integer
-                    Dim s As String
+                    Dim s As String = ""
                     Dim Name As String
                     Dim ContentID As Integer
                     Dim addonid As Integer
@@ -170,8 +170,35 @@ Namespace Contensive.adminNavigator
                             ' Link to Add-on Manager
                             '
                             NodeIDString = ""
-                            addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager")
-                            s = s & GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" & AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-on Manager", AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
+                            addonid = 0
+                            Dim addonManagerVerionGuid As String = AddonManagerGuid
+                            If (cp.Version.Substring(0, 1) = "4") Then
+                                '
+                                ' -- everything before v5
+                                addonManagerVerionGuid = AddonManagerGuid
+                                addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager")
+                            ElseIf (cp.Version.Substring(0, 4) = "5.00") Then
+                                '
+                                ' -- version 5.00
+                                Dim cs As CPCSBaseClass = cp.CSNew()
+                                addonManagerVerionGuid = "{3d643ebd-c482-49ac-99ca-03aabb28ee83}"
+                                If cs.Open("add-ons", "ccguid='{3d643ebd-c482-49ac-99ca-03aabb28ee83}'") Then
+                                    addonid = cs.GetInteger("id")
+                                End If
+                                cs.Close()
+                            Else
+                                '
+                                ' -- version 5.01+
+                                Dim cs As CPCSBaseClass = cp.CSNew()
+                                addonManagerVerionGuid = "{4DD876E7-BCC4-4AF0-B32E-59FFAB816478}"
+                                If cs.Open("add-ons", "ccguid='{4DD876E7-BCC4-4AF0-B32E-59FFAB816478}'") Then
+                                    addonid = cs.GetInteger("id")
+                                End If
+                                cs.Close()
+                            End If
+                            If (addonid > 0) Then
+                                s = s & GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" & addonManagerVerionGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, 0, NavIconTypeAddon, "Add-on Manager", AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS, "")
+                            End If
                             Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                             '
                             ' List Collections

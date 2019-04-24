@@ -4,20 +4,22 @@
 //----------
 //
 function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmptyHide) {
-		document.getElementById(OffNode).style.display='none';
-		document.getElementById(OnNode).style.display='block';
-		var e=document.getElementById(ContentNode);
-		if(e.ok) {//already populated
-			cj.ajax.addon('AdminNavigatorOpenNode','nodeid='+NodeID)
-		}else{
-			e.ok='ok';
-			var arg = {contentNode:ContentNode};
-			arg.onEmptyHide = onEmptyHide;
-			arg.onEmptyShow = onEmptyShow;
-			cj.ajax.addonCallback("AdminNavigatorGetNode",'nodeid='+NodeID,AdminNavOpenClickCallback,arg);
-			//cj.ajax.addon('AdminNavigatorGetNode','nodeid='+NodeID,'',ContentNode,onEmptyHide,onEmptyShow)
-		}
-		e.style.display='block';
+	console.log("AdminNavOpenClick, OffNode ["+OffNode+"], OnNode ["+OnNode+"], ContentNode ["+ContentNode+"], NodeID ["+NodeID+"], onEmptyHide ["+onEmptyHide+"], onEmptyShow ["+onEmptyShow+"]");
+	document.getElementById(OffNode).style.display='none';
+	document.getElementById(OnNode).style.display='block';
+	var e=document.getElementById(ContentNode);
+	if(e.ok) {//already populated
+		cj.ajax.addon('AdminNavigatorOpenNode','nodeid='+NodeID)
+		navBindNodes();
+	}else{
+		e.ok='ok';
+		var arg = {contentNode:ContentNode};
+		arg.onEmptyHide = onEmptyHide;
+		arg.onEmptyShow = onEmptyShow;
+		cj.ajax.addonCallback("AdminNavigatorGetNode",'nodeid='+NodeID,AdminNavOpenClickCallback,arg);
+		//cj.ajax.addon('AdminNavigatorGetNode','nodeid='+NodeID,'',ContentNode,onEmptyHide,onEmptyShow)
+	}
+	e.style.display='block';
 }
 function AdminNavOpenClickCallback(serverResponse, arg ) {
 	console.log("AdminNavOpenClickCallback, contentNode ["+arg.contentNode+"], onEmptyHide ["+arg.onEmptyHide+"], onEmptyShow ["+arg.onEmptyShow+"]");
@@ -68,3 +70,68 @@ jQuery( document ).ready(function(){
 	*/
 	navBindNodes();
 });
+/*
+* open/close
+*/
+var AdminNavPop=false;
+/* 
+* open nav when created closed 
+*/
+function OpenAdminNav() {
+	SetDisplay('AdminNavHeadOpened','block');
+	SetDisplay('AdminNavHeadClosed','none');
+	SetDisplay('AdminNavContentOpened','block');
+	SetDisplay('AdminNavContentMinWidth','block');
+	SetDisplay('AdminNavContentClosed','none');
+	cj.ajax.setVisitProperty('','AdminNavOpen','1');
+	navBindNodes();
+	if(!AdminNavPop){
+		cj.ajax.addonCallback("AdminNavigatorGetNode",'',OpenAdminNavCallback);
+		AdminNavPop=true;
+	}else{
+		cj.ajax.addon('AdminNavigatorOpenNode');
+	}
+}
+function OpenAdminNavCallback(serverResponse){
+	if (serverResponse != '') {
+		var el1 = document.getElementById("AdminNavContentOpened");
+		if (el1) {
+			el1.innerHTML = serverResponse
+			SetDisplay('AdminNavContentOpened','block');
+			navBindNodes();
+			};
+	}
+}
+/* 
+* close nav when created closed 
+*/
+function reCloseAdminNav() {
+	SetDisplay('AdminNavHeadOpened','none');
+	SetDisplay('AdminNavHeadClosed','block');
+	SetDisplay('AdminNavContentOpened','none');
+	SetDisplay('AdminNavContentMinWidth','none');
+	SetDisplay('AdminNavContentClosed','block');
+	cj.ajax.setVisitProperty('','AdminNavOpen','0')
+}
+/* 
+* open nav when created open
+*/
+function closeAdminNav() {
+	SetDisplay('AdminNavHeadOpened','none');
+	SetDisplay('AdminNavContentOpened','none');
+	SetDisplay('AdminNavHeadClosed','block');
+	SetDisplay('AdminNavContentClosed','block');
+	cj.ajax.setVisitProperty('','AdminNavOpen','0')
+}
+/* 
+* close nav when created open
+*/
+function reOpenAdminNav() {
+	SetDisplay('AdminNavHeadOpened','block');
+	SetDisplay('AdminNavContentOpened','block');
+	SetDisplay('AdminNavHeadClosed','none');
+	SetDisplay('AdminNavContentClosed','none');
+	navBindNodes();
+	cj.ajax.setVisitProperty('','AdminNavOpen','1')
+}
+
