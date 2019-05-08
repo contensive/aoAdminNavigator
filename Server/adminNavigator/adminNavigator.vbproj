@@ -70,7 +70,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>packages\contensive.clib.4.1.2\lib\net35\CPBase.dll</HintPath>
+      <HintPath>packages\Contensive.CPBaseClass.5.0.6\lib\net461\CPBase.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -88,6 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common.vb" />
+    <Compile Include="Controllers\CacheControllerWorkaround.vb" />
     <Compile Include="Views\getFullClass.vb" />
     <Compile Include="Views\getNodeClass.vb" />
     <Compile Include="Controllers\keyPtrIndexClass.vb" />
@@ -156,9 +157,7 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)"*.dll" "C:\Program Files (x86)\kma\Contensive\Addons"
-copy $(TargetDir)"*.dll" "C:\ProgramData\Contensive\AddonAssemblyBypass"
-
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>
