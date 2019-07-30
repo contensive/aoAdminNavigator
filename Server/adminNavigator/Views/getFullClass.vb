@@ -51,7 +51,7 @@ Namespace Contensive.adminNavigator
                         & ""
                     AdminNavContentOpened = "" _
                         & cr & "<div id=""AdminNavContentOpened"" class=""opened"">" _
-                        & kmaIndent(GetNode.Execute(CP).ToString & "<img alt=""space"" src=""/cclib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
+                        & kmaIndent(GetNode.Execute(CP).ToString & "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
                         & cr & "</div>" _
                         & ""
                     AdminNavContentClosed = "" _
@@ -88,9 +88,9 @@ Namespace Contensive.adminNavigator
                         & ""
                     AdminNavContent = "" _
                         & cr & "<div class=""ccContentCon"">" _
-                        & cr & "<div id=""AdminNavContentOpened"" class=""opened"" style=""display:none;""><div style=""text-align:center;""><img src=""/cclib/images/ajax-loader-small.gif"" width=16 height=16></div></div>" _
+                        & cr & "<div id=""AdminNavContentOpened"" class=""opened"" style=""display:none;""><div style=""text-align:center;""><img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/ajax-loader-small.gif"" width=16 height=16></div></div>" _
                         & cr & "<div id=""AdminNavContentClosed"" class=""closed"">" & NavigatorClosedLabel & "</div>" _
-                        & cr & "<div id=""AdminNavContentMinWidth"" style=""display:none;""><img alt=""space"" src=""/cclib/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
+                        & cr & "<div id=""AdminNavContentMinWidth"" style=""display:none;""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                         & cr & "</div>"
                 End If
                 'AdminNavJS = "" _

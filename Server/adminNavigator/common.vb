@@ -8,65 +8,65 @@ Namespace Contensive.adminNavigator
         '
         '
         '
-        Public Const IconAdvanced = "<img src=""/cclib/images/NavAdv.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconAdvancedClosed = "<img src=""/cclib/images/NavAdvClosed.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconAdvancedOpened = "<img src=""/cclib/images/NavAdvOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        'Public Const IconAdvanced = "<img src=""/cclib/images/NavAdv.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
-        'Public Const IconAdvancedClosed = "<img src=""/cclib/images/NavAdvClosed.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
-        'Public Const IconAdvancedOpened = "<img src=""/cclib/images/NavAdvOpened.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
+        Public Const IconAdvanced = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdv.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAdvancedClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAdvancedOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        'Public Const IconAdvanced = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdv.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
+        'Public Const IconAdvancedClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvClosed.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
+        'Public Const IconAdvancedOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvOpened.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
         '
-        Public Const IconContent = "<img src=""/cclib/images/NavContent.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconContentOpened = "<img src=""/cclib/images/NavContentOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconContentClosed = "<img src=""/cclib/images/NavContentClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconContent = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContent.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconContentOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContentOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconContentClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContentClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconFolder = "<img src=""/cclib/images/NavFolderClosed.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconFolderClosed = "<img src=""/cclib/images/NavFolderClosed.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconFolderOpened = "<img src=""/cclib/images/NavFolderOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconFolderNoSubNodes = "<img src=""/cclib/images/NavFolder.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconFolder = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavFolderClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconFolderClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavFolderClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconFolderOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavFolderOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconFolderNoSubNodes = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavFolder.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconEmail = "<img src=""/cclib/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconEmailClosed = "<img src=""/cclib/images/NavEmailClosed.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconEmailOpened = "<img src=""/cclib/images/NavEmailOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconSystemEmail = "<img src=""/cclib/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconConditionalEmail = "<img src=""/cclib/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconGroupEmail = "<img src=""/cclib/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconEmail = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconEmailClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmailClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconEmailOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmailOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconSystemEmail = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconConditionalEmail = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconGroupEmail = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavEmail.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconUsers = "<img src=""/cclib/images/NavUsers.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconUsersOpened = "<img src=""/cclib/images/NavUsersOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconUsersClosed = "<img src=""/cclib/images/NavUsersClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconUsers = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavUsers.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconUsersOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavUsersOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconUsersClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavUsersClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconReports = "<img src=""/cclib/images/NavReports.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconReportsOpened = "<img src=""/cclib/images/NavReportsOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconReportsClosed = "<img src=""/cclib/images/NavReportsClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconReports = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavReports.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconReportsOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavReportsOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconReportsClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavReportsClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconSettings = "<img src=""/cclib/images/NavSettings.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconSettingsOpened = "<img src=""/cclib/images/NavSettingsOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconSettingsClosed = "<img src=""/cclib/images/NavSettingsClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconSettings = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavSettings.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconSettingsOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavSettingsOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconSettingsClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavSettingsClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconTools = "<img src=""/cclib/images/NavTools.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconToolsOpened = "<img src=""/cclib/images/NavToolsOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconToolsClosed = "<img src=""/cclib/images/NavToolsClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconTools = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavTools.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconToolsOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavToolsOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconToolsClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavToolsClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconRecord = "<img src=""/cclib/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconRecordOpened = "<img src=""/cclib/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconRecordClosed = "<img src=""/cclib/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconRecord = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconRecordOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconRecordClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavRecord.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconHelp = "<img src=""/cclib/images/NavHelp.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconHelp = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHelp.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconAddon = "<img src=""/cclib/images/NavAddons.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAddon = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAddons.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconAddons = "<img src=""/cclib/images/NavAddons.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconAddonsOpened = "<img src=""/cclib/images/NavAddonsOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconAddonsClosed = "<img src=""/cclib/images/NavAddonsClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAddons = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAddons.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAddonsOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAddonsOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconAddonsClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAddonsClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
-        Public Const IconPublicHome = "<img src=""/cclib/images/NavPublicHome.gif"" class=""ccImgA"" title=""Public Home"">"
-        Public Const IconAdminHome = "<img src=""/cclib/images/NavHome.gif"" class=""ccImgA"" title=""Admin Home"">"
+        Public Const IconPublicHome = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavPublicHome.gif"" class=""ccImgA"" title=""Public Home"">"
+        Public Const IconAdminHome = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavHome.gif"" class=""ccImgA"" title=""Admin Home"">"
         '
-        Public Const IconBox = "<img src=""/cclib/mktree/box.gif"" width=19 height=19 border=0 style=""vertical-align:middle;"" title=""{title}"">"
+        Public Const IconBox = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/mktree/box.gif"" width=19 height=19 border=0 style=""vertical-align:middle;"" title=""{title}"">"
         '
-        Public Const IconManageContent = "<img src=""/cclib/images/NavContent.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconManageContentOpened = "<img src=""/cclib/images/NavContentOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        Public Const IconManageContentClosed = "<img src=""/cclib/images/NavContentClosed.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconManageContent = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContent.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconManageContentOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContentOpened.gif"" class=""ccImgA"" title=""{title}"">"
+        Public Const IconManageContentClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContentClosed.gif"" class=""ccImgA"" title=""{title}"">"
         '
         Public Const NavigatorContentName = "Navigator Entries"
         Public Const LegacyMenuContentName = "Menu Entries"
@@ -4837,7 +4837,7 @@ ErrorTrap:
         '        '
         '        '
         '        Public Function kmaGetSpacer(Width as integer, Height as integer) As String
-        '            kmaGetSpacer = "<img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & Width & """ height=""" & Height & """ border=""0"">"
+        '            kmaGetSpacer = "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""" & Width & """ height=""" & Height & """ border=""0"">"
         '        End Function
         '        '
         '        '
@@ -5599,12 +5599,12 @@ ErrorTrap:
         '                ' No icon given, use the default
         '                '
         '                If IconIsInline Then
-        '                    IconFilename = "/ccLib/images/IconAddonInlineDefault.png"
+        '                    IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconAddonInlineDefault.png"
         '                    IconWidth = 62
         '                    IconHeight = 17
         '                    IconSprites = 0
         '                Else
-        '                    IconFilename = "/ccLib/images/IconAddonBlockDefault.png"
+        '                    IconFilename = "https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/IconAddonBlockDefault.png"
         '                    IconWidth = 57
         '                    IconHeight = 59
         '                    IconSprites = 4
@@ -5673,7 +5673,7 @@ ErrorTrap:
         '                '            & " onDblClick=""window.parent.OpenAddonPropertyWindow(this,'" & AdminURL & "');""" _
         '                '            & " alt=""" & IconAlt & """" _
         '                '            & " title=""" & IconTitle & """" _
-        '                '            & " src=""/ccLib/images/spacer.gif"""
+        '                '            & " src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"""
         '                '        ImgStyle = "background:url(" & IconFilename & ") " & (-1 * IconSpriteColumn * IconWidth) & "px 0px no-repeat;"
         '                '        ImgStyle = ImgStyle & "width:" & IconWidth & "px;"
         '                '        ImgStyle = ImgStyle & "height:" & IconHeight & "px;"
@@ -5693,7 +5693,7 @@ ErrorTrap:
         '                '        '    & " onDblClick=""window.parent.OpenAddonPropertyWindow(this);""" _
         '                '        '    & " alt=""" & IconAlt & """" _
         '                '        '    & " title=""" & IconTitle & """" _
-        '                '        '    & " src=""/ccLib/images/spacer.gif"""
+        '                '        '    & " src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"""
         '                '        If ACInstanceID <> "" Then
         '                '            GetAddonIconImg = GetAddonIconImg & " ACInstanceID=""" & ACInstanceID & """"
         '                '        End If
@@ -5904,7 +5904,7 @@ ErrorTrap:
         '                & " onDblClick=""" & onDblClick & """" _
         '                & " alt=""" & IconAlt & """" _
         '                & " title=""" & IconTitle & """" _
-        '                & " src=""/ccLib/images/spacer.gif"""
+        '                & " src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"""
         '            ImgStyle = "background:url(" & IconSrc & ") " & (-1 * SpriteColumn * IconWidth) & "px 0px no-repeat;"
         '            ImgStyle = ImgStyle & "width:" & IconWidth & "px;"
         '            ImgStyle = ImgStyle & "height:" & IconHeight & "px;"
