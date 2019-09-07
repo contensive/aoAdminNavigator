@@ -35,8 +35,7 @@
 		<RemoteMethod>No</RemoteMethod>
 		<ProcessRunOnce>No</ProcessRunOnce>
 		<ProcessInterval>0</ProcessInterval>
-		<MetaDescription><![CDATA[Contensive.adminNavigator.GetFullClass
-aoAdminNavigator.GetFullClass]]></MetaDescription>
+		<MetaDescription></MetaDescription>
 		<OtherHeadTags></OtherHeadTags>
 		<PageTitle></PageTitle>
 		<RemoteAssetLink></RemoteAssetLink>
