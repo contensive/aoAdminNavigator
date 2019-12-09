@@ -237,20 +237,6 @@ Namespace Contensive.adminNavigator
                             Loop While cs3.OK()
                         End If
                         Call cs3.Close()
-                        'CS = Main.openCSContent("Add-on Collections", Criteria, , , , , FieldList)
-                        'NodeType = NodeTypeCollection
-                        'BlockSubNodes = False
-                        'Do While Main.iscsok(CS)
-                        '    Name = Trim(csx.getText( "name"))
-                        '    NavIconTitle = Name
-                        '    CollectionID = csx.getInteger( "collectionid")
-                        '    NodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
-                        '    NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(NavIconTitle)
-                        '    s = s & GetNavigatorNode(cp,CollectionID, 0, 0, 0, 0, "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeCollection, false, False, OpenNodeList, NodeIDString, NodeNavigatorJS,"")
-                        '    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '    Call Main.NextCSRecord(CS)
-                        'Loop
-                        'Call Main.closeCs(CS)
                         '
                         ' Advanced folder to contain edit links to create addons and collections
                         '
@@ -506,13 +492,17 @@ Namespace Contensive.adminNavigator
                         s = s & GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS, "")
                         Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                         '
-                        Name = "Aggregate Access"
+                        Name = "Add-on Categories"
                         s = s & GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS, "")
                         Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
-                        '
-                        Name = "Scripting Modules"
-                        s = s & GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS, "")
-                        Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        ''
+                        'Name = "Aggregate Access"
+                        's = s & GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS, "")
+                        'Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
+                        ''
+                        'Name = "Scripting Modules"
+                        's = s & GetNode(cp, env, 0, 0, 0, 0, cp.Content.GetID(Name), "", 0, 0, Name, EmptyNodeList, 0, NavIconTypeContent, Name, AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, OpenNodeList, "", NodeNavigatorJS, "")
+                        'Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                     Case NodeIDAddonsNoCollection
                         '
                         ' special case: Add-on List that do not have collections
