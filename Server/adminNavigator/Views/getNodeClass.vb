@@ -1251,6 +1251,10 @@ Namespace Contensive.adminNavigator
                         Else
                             workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                         End If
+                        '
+                        ' -- add tooltip for addons
+                        workingNameHtmlEncoded &= "<i id=""" & AddonGuid & """ class=""contensiveToolTip fas fa-info-circle text-info"" href=""#"" data-toggle=""tooltip"" data-html=""true"" rel=""tooltip"" title=""...""></i>"
+                        '
                     ElseIf ContentID <> 0 Then
                         '
                         ' go edit the content
