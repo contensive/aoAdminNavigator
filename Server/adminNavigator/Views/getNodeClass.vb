@@ -11,7 +11,7 @@ Namespace Contensive.adminNavigator
     Public Class getNodeClass
         Inherits AddonBaseClass
         '
-        Public Structure NavigatorEnvironment
+        Public Class NavigatorEnvironment
             Public adminUrl As String
             Public isDeveloper As Boolean
             Public buildVersion As String
@@ -19,7 +19,21 @@ Namespace Contensive.adminNavigator
             Public addonEditCollectionUrlPrefix As String
             Public contentFieldEditToolPrefix As String
             Public cacheDependencyList As String
-        End Structure
+            Public allowToolTip As Boolean
+            '
+            Public Sub New(cp As CPBaseClass)
+                adminUrl = cp.Site.GetText("adminurl")
+                allowToolTip = cp.Site.GetBoolean("Admin Navigator Allow Tooltip")
+                buildVersion = cp.Site.GetText("buildversion")
+                isDeveloper = cp.User.IsDeveloper()
+                If isDeveloper Then
+                    addonEditAddonUrlPrefix = adminUrl & "?cid=" & cp.Content.GetID("add-ons") & "&af=4&id="
+                    addonEditCollectionUrlPrefix = adminUrl & "?cid=" & cp.Content.GetID("add-on collections") & "&af=4&id="
+                    contentFieldEditToolPrefix = adminUrl & "?af=105&contentid="
+                End If
+                cacheDependencyList = C51CacheController.createDependencyKeyInvalidateOnChange(cp, "ccMenuEntries", "default") & "," & C51CacheController.createDependencyKeyInvalidateOnChange(cp, "ccaggregatefunctions", "default")
+            End Sub
+        End Class
         ''' <summary>
         ''' Return the full navigator
         ''' </summary>
@@ -30,16 +44,7 @@ Namespace Contensive.adminNavigator
             Try
                 '
                 ' setup environment
-                Dim env As New NavigatorEnvironment
-                env.adminUrl = CP.Site.GetText("adminurl")
-                env.buildVersion = CP.Site.GetProperty("buildversion")
-                env.isDeveloper = CP.User.IsDeveloper()
-                If env.isDeveloper Then
-                    env.addonEditAddonUrlPrefix = env.adminUrl & "?cid=" & CP.Content.GetID("add-ons") & "&af=4&id="
-                    env.addonEditCollectionUrlPrefix = env.adminUrl & "?cid=" & CP.Content.GetID("add-on collections") & "&af=4&id="
-                    env.contentFieldEditToolPrefix = env.adminUrl & "?af=105&contentid="
-                End If
-                env.cacheDependencyList = C51CacheController.createDependencyKeyInvalidateOnChange(CP, "ccMenuEntries", "default") & "," & C51CacheController.createDependencyKeyInvalidateOnChange(CP, "ccaggregatefunctions", "default")
+                Dim env As New NavigatorEnvironment(CP)
                 '
                 Dim OpenNodeList As String = CP.Visit.GetText("AdminNavOpenNodeList")
                 Dim ParentNode As String = CP.Doc.GetText("nodeid")
@@ -88,7 +93,7 @@ Namespace Contensive.adminNavigator
                 Else
                     cacheKey = "AdminNav EmptyNodeList CM" & cp.User.Id
                 End If
-                Dim EmptyNodeList As String = cp.Cache.Read(cacheKey)
+                Dim EmptyNodeList As String = cp.Cache.GetText(cacheKey)
                 Dim SQL As String
                 If EmptyNodeList <> "" Then
                     Call cp.Site.TestPoint("adminNavigator, emptyNodeList from cache=[" & EmptyNodeList & "]")
@@ -104,7 +109,7 @@ Namespace Contensive.adminNavigator
                     End If
                     Call cs2.Close()
                     Call cp.Site.TestPoint("adminNavigator, emptyNodeList from db=[" & EmptyNodeList & "]")
-                    Call cp.Cache.Save(cacheKey, EmptyNodeList, env.cacheDependencyList)
+                    Call cp.Cache.Store(cacheKey, EmptyNodeList, env.cacheDependencyList)
                 End If
                 Dim EmptyNodeListInitial As String = EmptyNodeList
                 Dim TopParentNode As String = ParentNode
@@ -1019,7 +1024,30 @@ Namespace Contensive.adminNavigator
         '
         '
         '
-        Private Function GetNode(cp As CPBaseClass, env As NavigatorEnvironment, CollectionID As Integer, ContentControlID As Integer, helpCollectionID As Integer, HelpAddonID As Integer, ContentID As Integer, Link As String, addonid As Integer, ignore As Integer, Name As String, EmptyNodeList As String, NavigatorID As Integer, NavIconType As Integer, NavIconTitleHtmlEncoded As String, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, NewWindow As Boolean, BlockSubNodes As Boolean, OpenNodeList As String, NodeIDString As String, ByRef Return_NavigatorJS As String, linkSuffixList As String) As String
+        Private Function GetNode(cp As CPBaseClass,
+                                 env As NavigatorEnvironment,
+                                 CollectionID As Integer,
+                                 ContentControlID As Integer,
+                                 helpCollectionID As Integer,
+                                 HelpAddonID As Integer,
+                                 ContentID As Integer,
+                                 Link As String,
+                                 addonid As Integer,
+                                 ignore As Integer,
+                                 Name As String,
+                                 EmptyNodeList As String,
+                                 NavigatorID As Integer,
+                                 NavIconType As Integer,
+                                 NavIconTitleHtmlEncoded As String,
+                                 AutoManageAddons As Boolean,
+                                 NodeType As NodeTypeEnum,
+                                 NewWindow As Boolean,
+                                 BlockSubNodes As Boolean,
+                                 OpenNodeList As String,
+                                 NodeIDString As String,
+                                 ByRef Return_NavigatorJS As String,
+                                 linkSuffixList As String
+                                 ) As String
             On Error GoTo ErrorTrap
             '
             Dim csCollection As Integer
@@ -1252,9 +1280,11 @@ Namespace Contensive.adminNavigator
                             workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & Link & """ title=""Run '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                         End If
                         '
-                        ' -- add tooltip for addons
-                        workingNameHtmlEncoded &= "<i id=""" & AddonGuid & """ class=""contensiveToolTip fas fa-info-circle text-info"" href=""#"" data-toggle=""tooltip"" data-html=""true"" rel=""tooltip"" title=""...""></i>"
-                        '
+                        If (env.allowToolTip) Then
+                            '
+                            ' -- add tooltip for addons
+                            workingNameHtmlEncoded &= "<i data-tooltip=""" & AddonGuid & """ class=""contensiveToolTip fas fa-info-circle text-info"" href=""#"" data-toggle=""tooltip"" data-html=""true"" rel=""tooltip"" title=""...""></i>"
+                        End If
                     ElseIf ContentID <> 0 Then
                         '
                         ' go edit the content
