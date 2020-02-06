@@ -3,32 +3,25 @@ Imports System.Collections.Generic
 Imports System.Text
 Imports Contensive.BaseClasses
 
-Namespace Contensive.adminNavigator
-    Public Class getFullClass
+Namespace Contensive.AdminNavigator
+    Public Class GetFullClass
         Inherits AddonBaseClass
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
+                Dim OpenNodeList As String = CP.Visit.GetText("AdminNavOpenNodeList", "")
+                Dim AdminNavOpen As Boolean = CP.Utils.EncodeBoolean(CP.Visit.GetText("AdminNavOpen", "1"))
                 Const NavigatorClosedLabel = "<div style=""font-size:9px;text-align:center;"">&nbsp;<BR>N<BR>a<BR>v<BR>i<BR>g<BR>a<BR>t<BR>o<BR>r</div>"
-                Dim OpenNodeList As String
-                Dim AdminNavOpen As Boolean
                 Dim AdminNavContent As String
                 Dim AdminNavHead As String
-                'Dim AdminNavJS As String
                 Dim AdminNavHeadOpened As String
                 Dim AdminNavHeadClosed As String
-                Dim AdminNavContentOpened As String
-                Dim AdminNavContentClosed As String
-                Dim GetNode As getNodeClass
-                '
-                OpenNodeList = CP.Visit.GetText("AdminNavOpenNodeList", "")
-                AdminNavOpen = CP.Utils.EncodeBoolean(CP.Visit.GetText("AdminNavOpen", "1"))
                 If AdminNavOpen Then
                     '
                     ' draw the page with Nav Opened
                     '
-                    GetNode = New getNodeClass
+                    Dim GetNode As GetNodeClass = New GetNodeClass
                     CP.Doc.SetProperty("nodeid", "0")
                     AdminNavHeadOpened = "" _
                         & cr & "<div id=""AdminNavHeadOpened"" class=""opened"">" _
@@ -49,12 +42,12 @@ Namespace Contensive.adminNavigator
                         & kmaIndent(AdminNavHeadClosed) _
                         & cr & "</div>" _
                         & ""
-                    AdminNavContentOpened = "" _
+                    Dim AdminNavContentOpened As String = "" _
                         & cr & "<div id=""AdminNavContentOpened"" class=""opened"">" _
                         & kmaIndent(GetNode.Execute(CP).ToString & "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
                         & cr & "</div>" _
                         & ""
-                    AdminNavContentClosed = "" _
+                    Dim AdminNavContentClosed As String = "" _
                         & cr & "<div id=""AdminNavContentClosed"" class=""closed"" style=""display:none;"">" & NavigatorClosedLabel & "</div>" _
                         & ""
                     AdminNavContent = "" _
@@ -93,17 +86,6 @@ Namespace Contensive.adminNavigator
                         & cr & "<div id=""AdminNavContentMinWidth"" style=""display:none;""><img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both""></div>" _
                         & cr & "</div>"
                 End If
-                'AdminNavJS = "" _
-                '        & cr & "var AdminNavPop=false;" _
-                '        & cr & "/* drawn closed */" _
-                '        & cr & "function OpenAdminNav() {SetDisplay('AdminNavHeadOpened','block');SetDisplay('AdminNavHeadClosed','none');SetDisplay('AdminNavContentOpened','block');SetDisplay('AdminNavContentMinWidth','block');SetDisplay('AdminNavContentClosed','none');cj.ajax.setVisitProperty('','AdminNavOpen','1');navBindNodes();if(!AdminNavPop){cj.ajax.addon('AdminNavigatorGetNode','','','AdminNavContentOpened');AdminNavPop=true;}else{cj.ajax.addon('AdminNavigatorOpenNode');}}" _
-                '        & cr & "function reCloseAdminNav() {SetDisplay('AdminNavHeadOpened','none');SetDisplay('AdminNavHeadClosed','block');SetDisplay('AdminNavContentOpened','none');SetDisplay('AdminNavContentMinWidth','none');SetDisplay('AdminNavContentClosed','block');cj.ajax.setVisitProperty('','AdminNavOpen','0')}" _
-                '        & cr & "/* drawn open */" _
-                '        & cr & "function closeAdminNav() {SetDisplay('AdminNavHeadOpened','none');SetDisplay('AdminNavContentOpened','none');SetDisplay('AdminNavHeadClosed','block');SetDisplay('AdminNavContentClosed','block');cj.ajax.setVisitProperty('','AdminNavOpen','0')}" _
-                '        & cr & "function reOpenAdminNav() {SetDisplay('AdminNavHeadOpened','block');SetDisplay('AdminNavContentOpened','block');SetDisplay('AdminNavHeadClosed','none');SetDisplay('AdminNavContentClosed','none');navBindNodes();cj.ajax.setVisitProperty('','AdminNavOpen','1')}" _
-                '        & cr & ""
-
-                'Call CP.Doc.AddBodyEnd("<script language=""javascript"" type=""text/javascript"">" & AdminNavJS & "</script>")
                 returnHtml = "" _
                     & cr & "<div>" _
                     & kmaIndent(AdminNavHead) _

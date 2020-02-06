@@ -24,8 +24,8 @@ function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmpty
 function AdminNavOpenClickCallback(serverResponse, arg ) {
 	console.log("AdminNavOpenClickCallback, contentNode ["+arg.contentNode+"], onEmptyHide ["+arg.onEmptyHide+"], onEmptyShow ["+arg.onEmptyShow+"]");
 	if (serverResponse == '') {
-		if (document.getElementById(onEmptyHideID)) { document.getElementById(onEmptyHideID).style.display = 'none' }
-		if (document.getElementById(onEmptyShowID)) { document.getElementById(onEmptyShowID).style.display = 'block' }
+		if (document.getElementById(arg.onEmptyHide)) { document.getElementById(arg.onEmptyHide).style.display = 'none' }
+		if (document.getElementById(arg.onEmptyShow)) { document.getElementById(arg.onEmptyShow).style.display = 'block' }
 	} else {
 		var el1 = document.getElementById(arg.contentNode);
 		if (el1) {

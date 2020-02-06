@@ -4,7 +4,7 @@
 Imports System.Runtime.InteropServices
 
 '
-Namespace Contensive.adminNavigator
+Namespace Contensive.AdminNavigator
     '
     '
     '

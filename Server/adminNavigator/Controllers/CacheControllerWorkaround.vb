@@ -5,7 +5,7 @@ Imports System.Text
 Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
 
-Namespace Contensive.adminNavigator
+Namespace Contensive.AdminNavigator
     '
     ' -- simulate C51 base class
     Public Class C51CacheController

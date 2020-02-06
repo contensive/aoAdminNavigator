@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1252"?>
 <Collection name="Admin Navigator" guid="{0AB76B52-2C9E-4339-B4DB-902AF42B57EB}" system="No" updatable="Yes" blockNavigatorNode="No">
 	<HelpLink></HelpLink>
-	<Help></Help>
+	<Help></Help>	
 	<Addon name="Admin Navigator" guid="{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
@@ -47,7 +47,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass></DotNetClass>
+		<DotNetClass>Contensive.AdminNavigator.CloseNodeClass</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -82,20 +82,7 @@
 		<Styles></Styles>
 		<styleslinkhref></styleslinkhref>
 		<Scripting Language="VBScript" EntryPoint="closeNode" Timeout="0">
-			<Code><![CDATA[Function closeNode
-		Dim NodeIDString
-		Dim OpenNodeList
-		NodeIDString = cp.doc.getText("nodeid")
-		'NodeIDString = ccLib.getStreamText("nodeid")
-		If NodeIDString <> "" Then
-			OpenNodeList = cp.visit.getProperty("AdminNavOpenNodeList")
-			If OpenNodeList <> "" Then
-				OpenNodeList = Replace(OpenNodeList & ",", "," & NodeIDString & ",", ",",1,99,1)
-				OpenNodeList = Mid(OpenNodeList, 1, Len(OpenNodeList) - 1)
-			End If
-			Call cp.visit.setProperty("AdminNavOpenNodeList", OpenNodeList)
-		End If
-End Function]]></Code>
+			<Code></Code>
 		</Scripting>
 	</Addon>
 	<Addon name="AdminNavigatorGetNode" guid="{2CC46760-D008-4413-B2B2-2EA9CE8BC6E9}" type="Add-on">
@@ -142,7 +129,7 @@ End Function]]></Code>
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass></DotNetClass>
+		<DotNetClass>Contensive.AdminNavigator.OpenNodeClass</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -177,17 +164,7 @@ End Function]]></Code>
 		<Styles></Styles>
 		<styleslinkhref></styleslinkhref>
 		<Scripting Language="VBScript" EntryPoint="openNode" Timeout="0">
-			<Code><![CDATA[Function openNode
-		Dim NodeIDString
-		Dim OpenNodeList
-		NodeIDString = cp.doc.getInteger("nodeid")
-		'NodeIDString = ccLib.getStreamText("nodeid")
-		if NodeIDString<>"" then
-			OpenNodeList = cp.visit.getProperty("AdminNavOpenNodeList", "")
-			OpenNodeList = OpenNodeList & "," & NodeIDString
-			Call cp.visit.setProperty("AdminNavOpenNodeList", OpenNodeList)
-		End If
-End Function]]></Code>
+			<Code></Code>
 		</Scripting>
 	</Addon>
 	<ImportCollection name="JQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>

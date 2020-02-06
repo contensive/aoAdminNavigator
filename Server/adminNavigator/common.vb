@@ -1,5 +1,5 @@
 ﻿
-Namespace Contensive.adminNavigator
+Namespace Contensive.AdminNavigator
     Module common
         '
         Public Const iconCloseWindow As String = "<i title=close class=""fas fa-window-close"" style=""color:#fff""></i>"
