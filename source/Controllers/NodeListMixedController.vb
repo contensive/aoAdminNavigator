@@ -1,6 +1,7 @@
 ﻿
 Imports System
 Imports System.Collections.Generic
+Imports System.Linq
 Imports System.Text
 Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
@@ -8,6 +9,10 @@ Imports Contensive.Models.Db
 
 Namespace Contensive.AdminNavigator
     Public Class NodeListMixedController
+        '
+        Private Shared Function compare1(a As KeyValuePair(Of String, SortNodeType), b As KeyValuePair(Of String, SortNodeType)) As Integer
+            Return a.Key.CompareTo(b.Key)
+        End Function
         '
         '====================================================================================================
         '========================================================================
@@ -103,6 +108,9 @@ Namespace Contensive.AdminNavigator
                         Call cs11.Close()
                     End Using
                     '
+                    'sortedNodes = sortedNodes.Sort(compare1)
+                    sortedNodes.Sort(Function(valueA, valueB) valueA.Key.CompareTo(valueB.Key))
+                    '
                     If sortedNodes.Count = 0 Then
                         '
                         ' Empty list, add to env.EmptyNodeList
@@ -110,19 +118,32 @@ Namespace Contensive.AdminNavigator
                         env.EmptyNodeList = env.EmptyNodeList & "," & TopParentNode
                     Else
                         lastName = ""
+                        Dim contentNodeList As String = ""
+                        Dim addonNodeList As String = ""
                         For Each kvp In sortedNodes
                             Dim nodeName As String = kvp.Key.ToLowerInvariant()
                             If nodeName <> lastName Then
                                 Dim sortedNode As SortNodeType = kvp.Value
                                 Dim addon As AddonModel = Nothing
-                                If (sortedNode.addonid > 0) Then
+                                If (sortedNode.ContentID.Equals(0) And sortedNode.addonid.Equals(0)) Then
+                                    '
+                                    ' -- nard-coded nodes first
+                                    returnNav &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.ContentID, sortedNode.Link, addon, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
+                                ElseIf (sortedNode.addonid > 0) Then
+                                    '
+                                    ' -- addon nodes next
                                     addon = DbBaseModel.create(Of AddonModel)(cp, sortedNode.addonid)
+                                    addonNodeList &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.ContentID, sortedNode.Link, addon, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
+                                Else
+                                    '
+                                    ' -- last content nodes
+                                    contentNodeList &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.ContentID, sortedNode.Link, addon, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
                                 End If
-                                returnNav = returnNav & NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.ContentID, sortedNode.Link, addon, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
-                                Return_DraggableJS = Return_DraggableJS & NodeDraggableJS
+                                Return_DraggableJS &= NodeDraggableJS
                                 lastName = nodeName
                             End If
                         Next
+                        returnNav &= addonNodeList & contentNodeList
                     End If
                 End If
             Catch ex As Exception
@@ -131,6 +152,10 @@ Namespace Contensive.AdminNavigator
             End Try
             Return returnNav
         End Function
+
+        'Private Shared Function compare1(x As KeyValuePair(Of String, SortNodeType), y As KeyValuePair(Of String, SortNodeType)) As Integer
+        '    Throw New NotImplementedException()
+        'End Function
         '
         '
     End Class
