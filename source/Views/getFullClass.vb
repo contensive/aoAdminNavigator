@@ -10,18 +10,15 @@ Namespace Contensive.AdminNavigator
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
             Dim returnHtml As String = ""
             Try
-                Dim OpenNodeList As String = CP.Visit.GetText("AdminNavOpenNodeList", "")
-                Dim AdminNavOpen As Boolean = CP.Utils.EncodeBoolean(CP.Visit.GetText("AdminNavOpen", "1"))
-                Const NavigatorClosedLabel = "<div style=""font-size:9px;text-align:center;"">&nbsp;<BR>N<BR>a<BR>v<BR>i<BR>g<BR>a<BR>t<BR>o<BR>r</div>"
+                Dim env As New NavigatorEnvironment(CP)
                 Dim AdminNavContent As String
                 Dim AdminNavHead As String
                 Dim AdminNavHeadOpened As String
                 Dim AdminNavHeadClosed As String
-                If AdminNavOpen Then
+                If env.AdminNavOpen Then
                     '
                     ' draw the page with Nav Opened
                     '
-                    Dim GetNode As GetNodeClass = New GetNodeClass
                     CP.Doc.SetProperty("nodeid", "0")
                     AdminNavHeadOpened = "" _
                         & cr & "<div id=""AdminNavHeadOpened"" class=""opened"">" _
@@ -44,7 +41,7 @@ Namespace Contensive.AdminNavigator
                         & ""
                     Dim AdminNavContentOpened As String = "" _
                         & cr & "<div id=""AdminNavContentOpened"" class=""opened"">" _
-                        & kmaIndent(GetNode.Execute(CP).ToString & "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
+                        & kmaIndent(GetNodeClass.getNode(CP, env).ToString & "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
                         & cr & "</div>" _
                         & ""
                     Dim AdminNavContentClosed As String = "" _

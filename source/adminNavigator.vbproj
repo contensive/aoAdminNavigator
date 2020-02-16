@@ -75,12 +75,11 @@
     <AssemblyOriginatorKeyFile>adminnavkey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ContensiveDbModels, Version=5.19.1122.2, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.DbModels.5.19.1122.2\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.2002.13.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
+      <HintPath>packages\Contensive.DbModels.5.2002.13.1\lib\net461\ContensiveDbModels.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.CPBaseClass.5.19.1122.2\lib\net472\CPBase.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>packages\Contensive.CPBaseClass.5.2002.13.1\lib\net472\CPBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -97,6 +96,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common.vb" />
+    <Compile Include="Controllers\NavigatorEnvironment.vb" />
+    <Compile Include="Controllers\NodeListController.vb" />
+    <Compile Include="Controllers\NodeController.vb" />
+    <Compile Include="Controllers\MenuSqlController.vb" />
+    <Compile Include="Controllers\NodeListMixedController.vb" />
+    <Compile Include="Controllers\_blankController.vb" />
+    <Compile Include="Controllers\NodeManageAddonsController.vb" />
     <Compile Include="Controllers\CacheControllerWorkaround.vb" />
     <Compile Include="Views\CloseNodeClass.vb" />
     <Compile Include="Views\OpenNodeClass.vb" />

@@ -2,18 +2,14 @@
 Namespace Contensive.AdminNavigator
     Module common
         '
+        Public Const NavigatorClosedLabel = "<div style=""font-size:9px;text-align:center;"">&nbsp;<BR>N<BR>a<BR>v<BR>i<BR>g<BR>a<BR>t<BR>o<BR>r</div>"
+        '
         Public Const iconCloseWindow As String = "<i title=close class=""fas fa-window-close"" style=""color:#fff""></i>"
         Public Const iconOpenWindow As String = "<i title=open class=""fa fa-angle-double-right"" style=""color:#fff""></i>"
-
-        '
-        '
         '
         Public Const IconAdvanced = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdv.gif"" class=""ccImgA"" title=""{title}"">"
         Public Const IconAdvancedClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvClosed.gif"" class=""ccImgA"" title=""{title}"">"
         Public Const IconAdvancedOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvOpened.gif"" class=""ccImgA"" title=""{title}"">"
-        'Public Const IconAdvanced = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdv.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
-        'Public Const IconAdvancedClosed = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvClosed.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
-        'Public Const IconAdvancedOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavAdvOpened.gif"" width=18 x height=18 border=0 style=""vertical-align:middle;"" title=""{title}"">"
         '
         Public Const IconContent = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContent.gif"" class=""ccImgA"" title=""{title}"">"
         Public Const IconContentOpened = "<img src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/NavContentOpened.gif"" class=""ccImgA"" title=""{title}"">"
@@ -80,7 +76,7 @@ Namespace Contensive.AdminNavigator
         Public Const NodeIDTools = "tools"
         Public Const NodeIDReports = "reports"
         '
-        Public Structure SortNodeType
+        Public Class SortNodeType
             Public Name As String
             Public addonid As Integer
             Public ContentControlID As Integer
@@ -94,7 +90,7 @@ Namespace Contensive.AdminNavigator
             Public HelpAddonID As Integer
             Public helpCollectionID As Integer
             Public NodeIDString As String
-        End Structure
+        End Class
         '
         Public Enum NodeTypeEnum
             NodeTypeEntry = 0
