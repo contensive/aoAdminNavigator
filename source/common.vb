@@ -83,7 +83,7 @@ Namespace Contensive.AdminNavigator
             Public CollectionID As Integer
             Public NavigatorID As Integer
             Public NewWindow As Boolean
-            Public ContentID As Integer
+            Public contentID As Integer
             Public Link As String
             Public NavIconType As Integer
             Public NavIconTitle As String
