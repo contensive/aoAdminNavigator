@@ -4,7 +4,6 @@
 //----------
 //
 function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmptyHide) {
-	console.log("AdminNavOpenClick, OffNode ["+OffNode+"], OnNode ["+OnNode+"], ContentNode ["+ContentNode+"], NodeID ["+NodeID+"], onEmptyHide ["+onEmptyHide+"], onEmptyShow ["+onEmptyShow+"]");
 	document.getElementById(OffNode).style.display='none';
 	document.getElementById(OnNode).style.display='block';
 	var e=document.getElementById(ContentNode);
@@ -22,7 +21,6 @@ function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmpty
 	e.style.display='block';
 }
 function AdminNavOpenClickCallback(serverResponse, arg ) {
-	console.log("AdminNavOpenClickCallback, contentNode ["+arg.contentNode+"], onEmptyHide ["+arg.onEmptyHide+"], onEmptyShow ["+arg.onEmptyShow+"]");
 	if (serverResponse == '') {
 		if (document.getElementById(arg.onEmptyHide)) { document.getElementById(arg.onEmptyHide).style.display = 'none' }
 		if (document.getElementById(arg.onEmptyShow)) { document.getElementById(arg.onEmptyShow).style.display = 'block' }
@@ -45,11 +43,9 @@ function AdminNavCloseClick(OffNode,OnNode,ContentNode,NodeID,EmptyNode) {
 */
 function navBindNodes() {
 	jQuery(".navDrag").each(function(){
-		console.log("navBindNodes, node [" + this.id + "]");
 		jQuery(this).draggable({
 			stop: function(event, ui){
-				console.log("navDrag:stop, htmlId ["+this.id+"]");
-				navDrop(this.id,ui.position.left,ui.position.top);;
+				navDrop(this.id,ui.position.left,ui.position.top);
 			}
 			,helper: "clone"
 			,revert: "invalid"
