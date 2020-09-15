@@ -19,7 +19,7 @@ Namespace Contensive.AdminNavigator
                 Return String.Empty
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
-                Return String.Empty
+                Throw
             End Try
         End Function
     End Class

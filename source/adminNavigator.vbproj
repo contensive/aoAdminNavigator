@@ -101,14 +101,11 @@
     <Compile Include="Controllers\NodeController.vb" />
     <Compile Include="Controllers\MenuSqlController.vb" />
     <Compile Include="Controllers\NodeListMixedController.vb" />
-    <Compile Include="Controllers\_blankController.vb" />
     <Compile Include="Controllers\NodeManageAddonsController.vb" />
-    <Compile Include="Controllers\CacheControllerWorkaround.vb" />
     <Compile Include="Views\CloseNodeClass.vb" />
     <Compile Include="Views\OpenNodeClass.vb" />
     <Compile Include="Views\GetFullClass.vb" />
     <Compile Include="Views\GetNodeClass.vb" />
-    <Compile Include="Controllers\keyPtrIndexClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

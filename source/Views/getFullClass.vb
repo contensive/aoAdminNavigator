@@ -8,13 +8,13 @@ Namespace Contensive.AdminNavigator
         Inherits AddonBaseClass
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Dim returnHtml As String = ""
             Try
-                Dim env As New NavigatorEnvironment(CP)
+                Dim returnHtml As String = ""
                 Dim AdminNavContent As String
                 Dim AdminNavHead As String
                 Dim AdminNavHeadOpened As String
                 Dim AdminNavHeadClosed As String
+                Dim env As New NavigatorEnvironment(CP)
                 If env.AdminNavOpen Then
                     '
                     ' draw the page with Nav Opened
@@ -89,10 +89,11 @@ Namespace Contensive.AdminNavigator
                     & kmaIndent(AdminNavContent) _
                     & cr & "</div>" _
                     & ""
+                Return returnHtml
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
+                Throw
             End Try
-            Return returnHtml
         End Function
     End Class
 End Namespace

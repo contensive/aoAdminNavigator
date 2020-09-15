@@ -35,10 +35,7 @@ Namespace Contensive.AdminNavigator
             End If
             OpenNodeList = cp.Visit.GetText("AdminNavOpenNodeList", "")
             AdminNavOpen = cp.Utils.EncodeBoolean(cp.Visit.GetText("AdminNavOpen", "1"))
-
-
-            cacheDependencyList = C51CacheController.createDependencyKeyInvalidateOnChange(cp, "ccMenuEntries", "default") & "," & C51CacheController.createDependencyKeyInvalidateOnChange(cp, "ccaggregatefunctions", "default")
+            cacheDependencyList = cp.Cache.CreateDependencyKeyInvalidateOnChange("ccMenuEntries", "default") & "," & cp.Cache.CreateDependencyKeyInvalidateOnChange("ccaggregatefunctions", "default")
         End Sub
     End Class
-
 End Namespace

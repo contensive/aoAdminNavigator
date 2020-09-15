@@ -1,34 +1,34 @@
 ﻿
-Imports System
-Imports System.Collections.Generic
-Imports System.Linq
-Imports System.Text
-Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 
 Namespace Contensive.AdminNavigator
     Public Class NodeListMixedController
         '
-        Private Shared Function compare1(a As KeyValuePair(Of String, SortNodeType), b As KeyValuePair(Of String, SortNodeType)) As Integer
-            Return a.Key.CompareTo(b.Key)
-        End Function
-        '
         '====================================================================================================
-        '========================================================================
-        ' list mixed nodes (settings/reports/tools)   
+        ''' <summary>
+        ''' list mixed nodes (settings/reports/tools)   
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="env"></param>
+        ''' <param name="xEmptyNodeList"></param>
+        ''' <param name="TopParentNode"></param>
+        ''' <param name="AutoManageAddons"></param>
+        ''' <param name="NodeType"></param>
+        ''' <param name="xOpenNodeList"></param>
+        ''' <param name="AddonNavTypeID"></param>
+        ''' <param name="MenuParentNodeID"></param>
+        ''' <param name="AdminNavIconTypeSetting"></param>
+        ''' <param name="Return_DraggableJS"></param>
+        ''' <returns></returns>
         Friend Shared Function getNodeListMixed(cp As CPBaseClass, env As NavigatorEnvironment, xEmptyNodeList As String, TopParentNode As String, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, xOpenNodeList As String, AddonNavTypeID As Integer, MenuParentNodeID As Integer, AdminNavIconTypeSetting As Integer, ByRef Return_DraggableJS As String) As String
             Dim returnNav As String = ""
             Try
                 Dim NodeDraggableJS As String
                 Dim lastName As String
-                'Dim Index As New keyPtrIndexClass
-                'Dim SortNodes() As SortNodeType
                 Dim sortedNodes As New List(Of KeyValuePair(Of String, SortNodeType))
                 Dim SortPtr As Integer
-                Dim testPtr As Integer
                 Dim NodeIDString As String
-                Dim SQL As String
                 Dim Criteria As String
                 Dim BlockSubNodes As Boolean
                 '
@@ -54,28 +54,29 @@ Namespace Contensive.AdminNavigator
                             Criteria = Criteria & "and(admin<>0)"
                         End If
                     End If
-                    Dim cs10 As CPCSBaseClass = cp.CSNew
-                    If cs10.Open("add-ons", Criteria, "name") Then
-                        Do
-                            Dim nodeName As String = Trim(cs10.GetText("name"))
-                            Dim sortNode As New SortNodeType() With {
-                                    .Name = Trim(cs10.GetText("name")),
-                                    .addonid = cs10.GetInteger("ID"),
-                                    .NavIconTitle = .Name,
-                                    .ContentControlID = cs10.GetInteger("ContentControlID"),
-                                    .NavIconType = AdminNavIconTypeSetting
-                                }
-                            sortedNodes.Add(New KeyValuePair(Of String, SortNodeType)(nodeName, sortNode))
-                            SortPtr += 1
-                            cs10.GoNext()
-                        Loop While cs10.OK
-                    End If
-                    cs10.Close()
+                    Using cs10 As CPCSBaseClass = cp.CSNew
+                        If cs10.Open("add-ons", Criteria, "name") Then
+                            Do
+                                Dim nodeName As String = Trim(cs10.GetText("name"))
+                                Dim sortNode As New SortNodeType() With {
+                                        .Name = Trim(cs10.GetText("name")),
+                                        .addonid = cs10.GetInteger("ID"),
+                                        .NavIconTitle = .Name,
+                                        .ContentControlID = cs10.GetInteger("ContentControlID"),
+                                        .NavIconType = AdminNavIconTypeSetting
+                                    }
+                                sortedNodes.Add(New KeyValuePair(Of String, SortNodeType)(nodeName, sortNode))
+                                SortPtr += 1
+                                cs10.GoNext()
+                            Loop While cs10.OK
+                        End If
+                        cs10.Close()
+                    End Using
                     '
                     ' Add real navigator nodes to node list
                     '
                     Using cs11 As CPCSBaseClass = cp.CSNew
-                        If cs11.OpenSQL(MenuSqlController.GetMenuSQL(cp, "parentid=" & MenuParentNodeID, "")) Then
+                        If cs11.OpenSQL(MenuSqlController.getMenuSQL(cp, "parentid=" & MenuParentNodeID, "")) Then
                             Do
                                 Dim nodeName As String = Trim(cs11.GetText("name"))
                                 Dim navIconTitle As String = cs11.GetText("NavIconTitle")
@@ -108,7 +109,6 @@ Namespace Contensive.AdminNavigator
                         Call cs11.Close()
                     End Using
                     '
-                    'sortedNodes = sortedNodes.Sort(compare1)
                     sortedNodes.Sort(Function(valueA, valueB) valueA.Key.CompareTo(valueB.Key))
                     '
                     If sortedNodes.Count = 0 Then
@@ -145,17 +145,11 @@ Namespace Contensive.AdminNavigator
                     End If
                 End If
             Catch ex As Exception
-
                 cp.Site.ErrorReport(ex)
+                Throw
             End Try
             Return returnNav
         End Function
-
-        'Private Shared Function compare1(x As KeyValuePair(Of String, SortNodeType), y As KeyValuePair(Of String, SortNodeType)) As Integer
-        '    Throw New NotImplementedException()
-        'End Function
-        '
-        '
     End Class
 End Namespace
 

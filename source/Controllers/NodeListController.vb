@@ -1,8 +1,4 @@
 ﻿
-Imports System
-Imports System.Collections.Generic
-Imports System.Text
-Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 
@@ -329,7 +325,7 @@ Namespace Contensive.AdminNavigator
                         ' Special Case: build old top menus under this Navigator entry
                         '
                         BlockSubNodes = False
-                        Dim SQL As String = MenuSqlController.GetMenuSQL(cp, "(parentid=0)or(parentid is null)", LegacyMenuContentName)
+                        Dim SQL As String = MenuSqlController.getMenuSQL(cp, "(parentid=0)or(parentid is null)", LegacyMenuContentName)
                         If Not csChildList.OpenSQL(SQL) Then
                             '
                             ' Empty list, add to env.EmptyNodeList
@@ -365,7 +361,7 @@ Namespace Contensive.AdminNavigator
                         Link = cp.Utils.EncodeHTML(cp.Site.GetText("adminUrl"))
                         s &= cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconAdminHome & "</A>&nbsp;<A href=""" & Link & """>Admin Home</A></div>"
                         Dim cs8 As CPCSBaseClass = cp.CSNew()
-                        If cs8.OpenSQL(MenuSqlController.GetMenuSQL(cp, "((Parentid=0)or(Parentid is null))", NavigatorContentName)) Then
+                        If cs8.OpenSQL(MenuSqlController.getMenuSQL(cp, "((Parentid=0)or(Parentid is null))", NavigatorContentName)) Then
                             Do
                                 Name = Trim(cs8.GetText("name"))
                                 NavigatorID = cs8.GetInteger("ID")
@@ -432,7 +428,7 @@ Namespace Contensive.AdminNavigator
                                 '
                                 ' Navigator Entries, child under TopParentNode
                                 '
-                                Dim SQL As String = MenuSqlController.GetMenuSQL(cp, "parentid=" & TopParentNode, "")
+                                Dim SQL As String = MenuSqlController.getMenuSQL(cp, "parentid=" & TopParentNode, "")
                                 BlockSubNodes = False
                                 If Not csChildList.OpenSQL(SQL) Then
                                     '
@@ -547,10 +543,6 @@ Namespace Contensive.AdminNavigator
             End Try
             Return returnNav
         End Function
-        '
-
-
-
     End Class
 End Namespace
 

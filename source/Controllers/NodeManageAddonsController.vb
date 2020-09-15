@@ -1,12 +1,8 @@
 ﻿
-Imports System
-Imports System.Collections.Generic
-Imports System.Text
-Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class NodeManageAddonsController
+    Public NotInheritable Class NodeManageAddonsController
         '
         '====================================================================================================
         '
@@ -27,33 +23,34 @@ Namespace Contensive.AdminNavigator
                 If Not env.isDeveloper Then
                     criteria &= "and((blockNavigatorNode=0)or(blockNavigatorNode is null))"
                 End If
-                Dim cs3 As CPCSBaseClass = cp.CSNew()
-                Dim NodeType As NodeTypeEnum = NodeTypeEnum.NodeTypeCollection
-                Dim BlockSubNodes As Boolean = False
-                If cs3.Open("Add-on Collections", criteria, "name", True, fieldList, 9999, 1) Then
-                    Do
-                        Dim Name As String = Trim(cs3.GetText("name"))
-                        Dim NavIconTitle As String = Name
-                        Dim CollectionID As Integer = cs3.GetInteger("collectionid")
-                        nodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
-                        Dim NavIconTitleHtmlEncoded As String = cp.Utils.EncodeHTML(NavIconTitle)
-                        Dim linkSuffixList As String = ""
-                        If env.isDeveloper Then
-                            linkSuffixList &= "<a href=""" & env.addonEditCollectionUrlPrefix & CollectionID & """>edit</a>"
-                            If cs3.GetBoolean("system") Then
-                                linkSuffixList &= ",sys"
+                Using cs3 As CPCSBaseClass = cp.CSNew()
+                    Dim NodeType As NodeTypeEnum = NodeTypeEnum.NodeTypeCollection
+                    Dim BlockSubNodes As Boolean = False
+                    If cs3.Open("Add-on Collections", criteria, "name", True, fieldList, 9999, 1) Then
+                        Do
+                            Dim Name As String = Trim(cs3.GetText("name"))
+                            Dim NavIconTitle As String = Name
+                            Dim CollectionID As Integer = cs3.GetInteger("collectionid")
+                            nodeIDString = NodeIDManageAddonsCollectionPrefix & "." & CollectionID
+                            Dim NavIconTitleHtmlEncoded As String = cp.Utils.EncodeHTML(NavIconTitle)
+                            Dim linkSuffixList As String = ""
+                            If env.isDeveloper Then
+                                linkSuffixList &= "<a href=""" & env.addonEditCollectionUrlPrefix & CollectionID & """>edit</a>"
+                                If cs3.GetBoolean("system") Then
+                                    linkSuffixList &= ",sys"
+                                End If
+                                If cs3.GetBoolean("blockNavigatorNode") Then
+                                    linkSuffixList &= ",dev"
+                                End If
+                                linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
                             End If
-                            If cs3.GetBoolean("blockNavigatorNode") Then
-                                linkSuffixList &= ",dev"
-                            End If
-                            linkSuffixList = "&nbsp;(" & linkSuffixList & ")"
-                        End If
-                        result &= NodeController.GetNode(cp, env, CollectionID, 0, 0, 0, 0, "", Nothing, 0, Name, env.EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, env.AutoManageAddons, NodeTypeEnum.NodeTypeCollection, False, False, env.OpenNodeList, nodeIDString, Return_NavigatorJS, linkSuffixList)
-                        Return_NavigatorJS &= Return_NavigatorJS
-                        Call cs3.GoNext()
-                    Loop While cs3.OK()
-                End If
-                Call cs3.Close()
+                            result &= NodeController.GetNode(cp, env, CollectionID, 0, 0, 0, 0, "", Nothing, 0, Name, env.EmptyNodeList, 0, NavIconTypeAddon, NavIconTitleHtmlEncoded, env.AutoManageAddons, NodeTypeEnum.NodeTypeCollection, False, False, env.OpenNodeList, nodeIDString, Return_NavigatorJS, linkSuffixList)
+                            Return_NavigatorJS &= Return_NavigatorJS
+                            Call cs3.GoNext()
+                        Loop While cs3.OK()
+                    End If
+                    Call cs3.Close()
+                End Using
                 '
                 ' Advanced folder to contain edit links to create addons and collections
                 '
@@ -61,14 +58,11 @@ Namespace Contensive.AdminNavigator
                 result &= NodeController.GetNode(cp, env, 0, 0, 0, 0, 0, "", Nothing, 0, "Advanced", env.EmptyNodeList, 0, NavIconTypeFolder, "Add-ons With No Collection", env.AutoManageAddons, NodeTypeEnum.NodeTypeEntry, False, False, env.OpenNodeList, nodeIDString, Return_NavigatorJS, "")
                 Return_NavigatorJS &= Return_NavigatorJS
                 Return result
-
-
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
-                Return String.Empty
+                Throw
             End Try
         End Function
-        '
     End Class
 End Namespace
 

@@ -1,9 +1,5 @@
 
-Option Explicit On
-Option Strict On
-
 Imports Contensive.BaseClasses
-Imports Contensive.Models.Db
 
 Namespace Contensive.AdminNavigator
     Public Class GetNodeClass
@@ -44,7 +40,7 @@ Namespace Contensive.AdminNavigator
                 Return returnHtml
             Catch ex As Exception
                 CP.Site.ErrorReport(ex)
-                Return String.Empty
+                Throw
             End Try
         End Function
     End Class

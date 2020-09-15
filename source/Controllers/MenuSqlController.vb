@@ -1,44 +1,33 @@
 ﻿
-Imports System
-Imports System.Collections.Generic
-Imports System.Text
-Imports System.Text.RegularExpressions
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class MenuSqlController
+    Public NotInheritable Class MenuSqlController
         '
         '====================================================================================================
-        '========================================================================
-        ' Get sql for menu
-        '   if MenuContentName is blank, it will select values from either cdef
-        '========================================================================
-        '
-        Public Shared Function GetMenuSQL(cp As CPBaseClass, ParentCriteria As String, MenuContentName As String) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim CMCriteria As String
-            'Dim ParentCriteria As String
-            Dim Criteria As String
-            Dim SQL As String
-            Dim ContentControlCriteria As String
-            Dim SelectList As String
-            Dim ContentManagementList As String
-            '
-            Criteria = "(Active<>0)"
-            If MenuContentName <> "" Then
-                Criteria = Criteria & "AND" & cp.Content.GetContentControlCriteria(MenuContentName)
-            End If
-            'ParentCriteria = KmaEncodeMissingText(ParentCriteria, "")
-            If cp.User.IsDeveloper() Then
+        ''' <summary>
+        ''' Get sql for menu, if MenuContentName is blank, it will select values from either cdef
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="ParentCriteria"></param>
+        ''' <param name="MenuContentName"></param>
+        ''' <returns></returns>
+        Public Shared Function getMenuSQL(cp As CPBaseClass, ParentCriteria As String, MenuContentName As String) As String
+            Try
                 '
-                ' ----- Developer
-                '
-            ElseIf cp.User.IsAdmin Then
-                '
-                ' ----- Administrator
-                '
-                Criteria = Criteria _
+                Dim Criteria As String = "(Active<>0)"
+                If MenuContentName <> "" Then
+                    Criteria = Criteria & "AND" & cp.Content.GetContentControlCriteria(MenuContentName)
+                End If
+                If cp.User.IsDeveloper() Then
+                    '
+                    ' ----- Developer
+                    '
+                ElseIf cp.User.IsAdmin Then
+                    '
+                    ' ----- Administrator
+                    '
+                    Criteria = Criteria _
                     & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
                     & "AND(ID in (" _
                     & " SELECT AllowedEntries.ID" _
@@ -46,23 +35,25 @@ Namespace Contensive.AdminNavigator
                     & " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))" _
                         & "OR(ccContent.ID Is Null)" _
                     & "))"
-            Else
-                '
-                ' ----- Content Manager
-                '
-                ContentManagementList = MenuSqlController.GetContentManagementList(cp)
-                If ContentManagementList = "" Then
-                    CMCriteria = "(1=0)"
                 Else
-                    'ContentManagementList = Mid(ContentManagementList, 2, Len(ContentManagementList) - 2)
-                    If InStr(1, ContentManagementList, ",") = 0 Then
-                        CMCriteria = "(ccContent.ID=" & ContentManagementList & ")"
+                    '
+                    ' ----- Content Manager
+                    '
+                    Dim ContentManagementList As String = MenuSqlController.GetContentManagementList(cp)
+                    '
+                    Dim CMCriteria As String
+                    If ContentManagementList = "" Then
+                        CMCriteria = "(1=0)"
                     Else
-                        CMCriteria = "(ccContent.ID in (" & ContentManagementList & "))"
+                        'ContentManagementList = Mid(ContentManagementList, 2, Len(ContentManagementList) - 2)
+                        If InStr(1, ContentManagementList, ",") = 0 Then
+                            CMCriteria = "(ccContent.ID=" & ContentManagementList & ")"
+                        Else
+                            CMCriteria = "(ccContent.ID in (" & ContentManagementList & "))"
+                        End If
                     End If
-                End If
 
-                Criteria = Criteria _
+                    Criteria = Criteria _
                     & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
                     & "AND((AdminOnly is null)or(AdminOnly=0))" _
                     & "AND(ID in (" _
@@ -71,27 +62,25 @@ Namespace Contensive.AdminNavigator
                     & " Where (" & CMCriteria & "and(ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0))And((ccContent.AdminOnly is null)or(ccContent.AdminOnly=0)))" _
                         & "OR(ccContent.ID Is Null)" _
                     & "))"
-            End If
-            If ParentCriteria <> "" Then
-                Criteria = "(" & ParentCriteria & ")AND" & Criteria
-            End If
-            SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
-            GetMenuSQL = "select " & SelectList & " from ccMenuEntries where " & Criteria & " order by ccMenuEntries.Name"
-            Call cp.Site.TestPoint("adminNavigator, getmenuSql=" & GetMenuSQL)
-            Exit Function
-            '
-            ' ----- Error Trap
-            '
-ErrorTrap:
-            Call cp.Site.ErrorReport("Trap")
-            '
+                End If
+                If ParentCriteria <> "" Then
+                    Criteria = "(" & ParentCriteria & ")AND" & Criteria
+                End If
+                Dim SelectList As String = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
+                getMenuSQL = "select " & SelectList & " from ccMenuEntries where " & Criteria & " order by ccMenuEntries.Name"
+                Call cp.Site.TestPoint("adminNavigator, getmenuSql=" & getMenuSQL)
+            Catch ex As Exception
+                cp.Site.ErrorReport(ex)
+                Throw
+            End Try
         End Function
         '
         '===========================================================================
-        '   Get Authoring List
-        '       returns a comma delimited list of ContentIDs that the Member can author
-        '===========================================================================
-        '
+        ''' <summary>
+        ''' Get Authoring List, returns a comma delimited list of ContentIDs that the Member can author
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <returns></returns>
         Private Shared Function GetContentManagementList(cp As CPBaseClass) As String
             On Error GoTo ErrorTrap
             '
@@ -160,12 +149,6 @@ ErrorTrap:
 ErrorTrap:
             Call cp.Site.ErrorReport("")
         End Function
-        '
-        '
-        '
-        '
-        '
-        '
     End Class
 End Namespace
 
