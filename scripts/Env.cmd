@@ -1,7 +1,7 @@
 
 rem all paths are relative to the git scripts folder
 
-set appName=app200215
+set appName=app200509
 set majorVersion=5
 set minorVersion=1
 set collectionName=Admin Navigator

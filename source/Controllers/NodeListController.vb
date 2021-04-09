@@ -21,9 +21,7 @@ Namespace Contensive.AdminNavigator
                     cacheKey = "AdminNav EmptyNodeList CM" & cp.User.Id
                 End If
                 env.EmptyNodeList = cp.Cache.GetText(cacheKey)
-                If env.EmptyNodeList <> "" Then
-                    Call cp.Site.TestPoint("adminNavigator, emptyNodeList from cache=[" & env.EmptyNodeList & "]")
-                Else
+                If String.IsNullOrEmpty(env.EmptyNodeList) Then
                     Dim SQL As String = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
                     Dim cs2 As CPCSBaseClass = cp.CSNew()
                     If cs2.OpenSQL(SQL) Then
@@ -34,7 +32,6 @@ Namespace Contensive.AdminNavigator
                         env.EmptyNodeList = env.EmptyNodeList.Substring(1)
                     End If
                     Call cs2.Close()
-                    Call cp.Site.TestPoint("adminNavigator, env.EmptyNodeList from db=[" & env.EmptyNodeList & "]")
                     Call cp.Cache.Store(cacheKey, env.EmptyNodeList, env.cacheDependencyList)
                 End If
 

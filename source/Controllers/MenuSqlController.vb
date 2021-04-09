@@ -10,23 +10,20 @@ Namespace Contensive.AdminNavigator
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <param name="ParentCriteria"></param>
-        ''' <param name="MenuContentName"></param>
+        ''' <param name="menuContentName"></param>
         ''' <returns></returns>
-        Public Shared Function getMenuSQL(cp As CPBaseClass, ParentCriteria As String, MenuContentName As String) As String
+        Public Shared Function getMenuSQL(cp As CPBaseClass, ParentCriteria As String, menuContentName As String) As String
             Try
-                '
                 Dim Criteria As String = "(Active<>0)"
-                If MenuContentName <> "" Then
-                    Criteria = Criteria & "AND" & cp.Content.GetContentControlCriteria(MenuContentName)
+                If menuContentName <> "" Then
+                    Criteria = Criteria & "AND" & cp.Content.GetContentControlCriteria(menuContentName)
                 End If
                 If cp.User.IsDeveloper() Then
                     '
-                    ' ----- Developer
-                    '
+                    ' -- Developer
                 ElseIf cp.User.IsAdmin Then
                     '
-                    ' ----- Administrator
-                    '
+                    ' -- Administrator
                     Criteria = Criteria _
                     & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
                     & "AND(ID in (" _
@@ -68,7 +65,6 @@ Namespace Contensive.AdminNavigator
                 End If
                 Dim SelectList As String = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
                 getMenuSQL = "select " & SelectList & " from ccMenuEntries where " & Criteria & " order by ccMenuEntries.Name"
-                Call cp.Site.TestPoint("adminNavigator, getmenuSql=" & getMenuSQL)
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
                 Throw
