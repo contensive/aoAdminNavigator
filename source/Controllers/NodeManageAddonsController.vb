@@ -6,7 +6,7 @@ Namespace Contensive.AdminNavigator
         '
         '====================================================================================================
         '
-        Public Shared Function getNode(cp As CPBaseClass, env As NavigatorEnvironment, ByRef Return_NavigatorJS As String, ByRef nodeIDString As String) As String
+        Public Shared Function getNode(cp As CPBaseClass, env As ApplicationEnvironmentModel, ByRef Return_NavigatorJS As String, ByRef nodeIDString As String) As String
             Try
                 nodeIDString = ""
                 Dim result As String = ""

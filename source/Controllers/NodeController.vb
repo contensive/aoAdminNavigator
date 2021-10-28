@@ -7,7 +7,7 @@ Namespace Contensive.AdminNavigator
         '====================================================================================================
         '
         Friend Shared Function GetNode(cp As CPBaseClass,
-                                 env As NavigatorEnvironment,
+                                 env As ApplicationEnvironmentModel,
                                  CollectionID As Integer,
                                  ContentControlID As Integer,
                                  helpCollectionID As Integer,
@@ -214,13 +214,26 @@ Namespace Contensive.AdminNavigator
                             AddonName = addon.name
                             If addon.remoteMethod Then
                                 NewWindow = True
-                                link = cp.Site.GetText("adminUrl") & "?" & RequestNameRemoteMethodAddon & "=" & cp.Utils.EncodeRequestVariable(AddonName)
+                                '
+                                ' -- url encode, but encode space as %20, not plus
+                                For Each linkPart In AddonName.Split(" "c)
+                                    link &= "%20" & cp.Utils.EncodeUrl(linkPart)
+                                Next
+                                link = link.Substring(3)
+                                '
+                                If Not String.IsNullOrEmpty(link) Then
+                                    link = link.Replace("\", "/")
+                                    If link.Substring(0, 1) <> "/" Then
+                                        link = "/" & link
+                                    End If
+                                End If
+                                'link = env.adminUrl & "?" & RequestNameRemoteMethodAddon & "=" & cp.Utils.EncodeRequestVariable(AddonName)
                             End If
                             If link = "" Then
                                 If AddonGuid <> "" Then
-                                    link = cp.Utils.ModifyLinkQueryString(cp.Site.GetText("adminUrl"), "addonguid", AddonGuid, True)
+                                    link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "addonguid", AddonGuid, True)
                                 Else
-                                    link = cp.Utils.ModifyLinkQueryString(cp.Site.GetText("adminUrl"), "addonid", CStr(addon.id), True)
+                                    link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "addonid", CStr(addon.id), True)
                                 End If
                             End If
                             NavLinkHTMLId = "a" & addon.id
@@ -240,7 +253,7 @@ Namespace Contensive.AdminNavigator
                             '
                             ' go edit the content
                             '
-                            link = cp.Utils.ModifyLinkQueryString(cp.Site.GetText("adminUrl"), "cid", CStr(ContentID), True)
+                            link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "cid", CStr(ContentID), True)
                             NavLinkHTMLId = "c" & ContentID
                             workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                             If NewWindow Then
@@ -252,7 +265,7 @@ Namespace Contensive.AdminNavigator
                             '
                             ' go to Addon Help
                             '
-                            link = cp.Utils.ModifyLinkQueryString(cp.Site.GetText("adminUrl"), "helpaddonid", CStr(HelpAddonID), True)
+                            link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "helpaddonid", CStr(HelpAddonID), True)
                             workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                             If NewWindow Then
                                 workingNameHtmlEncoded = "<a href=""" & link & """ target=""_blank"" title=""Help for Add-on '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
@@ -279,7 +292,7 @@ Namespace Contensive.AdminNavigator
                                         NewWindow = True
                                     ElseIf (collectionHelp <> "") Then
                                         BlockNode = False
-                                        link = cp.Utils.ModifyLinkQueryString(cp.Site.GetText("adminUrl"), "helpcollectionid", CStr(helpCollectionID), True)
+                                        link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "helpcollectionid", CStr(helpCollectionID), True)
                                     End If
                                     If Not BlockNode Then
                                         If NewWindow Then

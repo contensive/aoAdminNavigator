@@ -9,7 +9,17 @@ rem
 rem Setup deployment folder
 rem
 
-call env.cmd
+set appName=weave
+set majorVersion=5
+set minorVersion=1
+set collectionName=Admin Navigator
+set collectionPath=..\collections\Admin Navigator\
+set solutionName=adminNavigator.sln
+set binPath=..\source\bin\debug\
+set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
+set deploymentFolderRoot=C:\Deployments\aoadminNavigator\Dev\
+
+
 set deploymentNumber=%1
 set year=%date:~12,4%
 set month=%date:~4,2%

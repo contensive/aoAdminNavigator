@@ -9,7 +9,7 @@ Namespace Contensive.AdminNavigator
         ''' <summary>
         ''' get Node list?
         ''' </summary>
-        Friend Shared Function getNodeList(cp As CPBaseClass, env As NavigatorEnvironment, ParentNode As String, ByRef Return_NavigatorJS As String) As String
+        Friend Shared Function getNodeList(cp As CPBaseClass, env As ApplicationEnvironmentModel, ParentNode As String, ByRef Return_NavigatorJS As String) As String
             Dim returnNav As String = ""
             Try
                 Dim cacheKey As String
@@ -355,7 +355,7 @@ Namespace Contensive.AdminNavigator
                         BlockSubNodes = False
                         Link = cp.Utils.EncodeHTML("http://" & cp.Site.Domain)
                         s &= cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconPublicHome & "</A>&nbsp;<A href=""" & Link & """>Public Home</A></div>"
-                        Link = cp.Utils.EncodeHTML(cp.Site.GetText("adminUrl"))
+                        Link = cp.Utils.EncodeHTML(env.adminUrl)
                         s &= cr & "<div class=ccNavLink><A href=""" & Link & """>" & IconAdminHome & "</A>&nbsp;<A href=""" & Link & """>Admin Home</A></div>"
                         Dim cs8 As CPCSBaseClass = cp.CSNew()
                         If cs8.OpenSQL(MenuSqlController.getMenuSQL(cp, "((Parentid=0)or(Parentid is null))", NavigatorContentName)) Then

@@ -21,7 +21,7 @@ Namespace Contensive.AdminNavigator
         ''' <param name="AdminNavIconTypeSetting"></param>
         ''' <param name="Return_DraggableJS"></param>
         ''' <returns></returns>
-        Friend Shared Function getNodeListMixed(cp As CPBaseClass, env As NavigatorEnvironment, xEmptyNodeList As String, TopParentNode As String, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, xOpenNodeList As String, AddonNavTypeID As Integer, MenuParentNodeID As Integer, AdminNavIconTypeSetting As Integer, ByRef Return_DraggableJS As String) As String
+        Friend Shared Function getNodeListMixed(cp As CPBaseClass, env As ApplicationEnvironmentModel, xEmptyNodeList As String, TopParentNode As String, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, xOpenNodeList As String, AddonNavTypeID As Integer, MenuParentNodeID As Integer, AdminNavIconTypeSetting As Integer, ByRef Return_DraggableJS As String) As String
             Dim returnNav As String = ""
             Try
                 Dim NodeDraggableJS As String

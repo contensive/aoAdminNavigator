@@ -96,7 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="common.vb" />
-    <Compile Include="Controllers\NavigatorEnvironment.vb" />
+    <Compile Include="Models\ApplicationEnvironmentModel.vb" />
     <Compile Include="Controllers\NodeListController.vb" />
     <Compile Include="Controllers\NodeController.vb" />
     <Compile Include="Controllers\MenuSqlController.vb" />
@@ -104,7 +104,7 @@
     <Compile Include="Controllers\NodeManageAddonsController.vb" />
     <Compile Include="Views\CloseNodeClass.vb" />
     <Compile Include="Views\OpenNodeClass.vb" />
-    <Compile Include="Views\GetFullClass.vb" />
+    <Compile Include="Addons\GetFullClass.vb" />
     <Compile Include="Views\GetNodeClass.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -160,9 +160,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -12,12 +12,12 @@ Namespace Contensive.AdminNavigator
         ''' <param name="CP"></param>
         ''' <returns></returns>
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
-            Return getNode(CP, New NavigatorEnvironment(CP))
+            Return getNode(CP, New ApplicationEnvironmentModel(CP))
         End Function
         '
         '====================================================================================================
         '
-        Public Shared Function getNode(ByVal CP As CPBaseClass, env As NavigatorEnvironment) As String
+        Public Shared Function getNode(ByVal CP As CPBaseClass, env As ApplicationEnvironmentModel) As String
             Try
                 Dim parentNode As String = CP.Doc.GetText("nodeid")
                 If (parentNode <> "") Then
