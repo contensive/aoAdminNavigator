@@ -14,9 +14,9 @@ Namespace Contensive.AdminNavigator
         ''' <returns></returns>
         Public Shared Function getMenuSQL(cp As CPBaseClass, ParentCriteria As String, menuContentName As String) As String
             Try
-                Dim Criteria As String = "(Active<>0)"
-                If menuContentName <> "" Then
-                    Criteria = Criteria & "AND" & cp.Content.GetContentControlCriteria(menuContentName)
+                Dim criteria As String = "(Active<>0)"
+                If Not String.IsNullOrEmpty(menuContentName) Then
+                    criteria &= "AND" & cp.Content.GetContentControlCriteria(menuContentName)
                 End If
                 If cp.User.IsDeveloper() Then
                     '
@@ -24,22 +24,22 @@ Namespace Contensive.AdminNavigator
                 ElseIf cp.User.IsAdmin Then
                     '
                     ' -- Administrator
-                    Criteria = Criteria _
-                    & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
-                    & "AND(ID in (" _
-                    & " SELECT AllowedEntries.ID" _
-                    & " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID" _
-                    & " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))" _
-                        & "OR(ccContent.ID Is Null)" _
-                    & "))"
+                    criteria = criteria _
+                        & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
+                        & "AND(ID in (" _
+                        & " SELECT AllowedEntries.ID" _
+                        & " FROM CCMenuEntries AllowedEntries LEFT JOIN ccContent ON AllowedEntries.ContentID = ccContent.ID" _
+                        & " Where ((ccContent.Active<>0)And((ccContent.DeveloperOnly is null)or(ccContent.DeveloperOnly=0)))" _
+                            & "OR(ccContent.ID Is Null)" _
+                        & "))"
                 Else
                     '
                     ' ----- Content Manager
                     '
-                    Dim ContentManagementList As String = MenuSqlController.GetContentManagementList(cp)
+                    Dim ContentManagementList As String = MenuSqlController.getContentManagementList(cp)
                     '
                     Dim CMCriteria As String
-                    If ContentManagementList = "" Then
+                    If String.IsNullOrEmpty(ContentManagementList) Then
                         CMCriteria = "(1=0)"
                     Else
                         'ContentManagementList = Mid(ContentManagementList, 2, Len(ContentManagementList) - 2)
@@ -50,7 +50,7 @@ Namespace Contensive.AdminNavigator
                         End If
                     End If
 
-                    Criteria = Criteria _
+                    criteria = criteria _
                     & "AND((DeveloperOnly is null)or(DeveloperOnly=0))" _
                     & "AND((AdminOnly is null)or(AdminOnly=0))" _
                     & "AND(ID in (" _
@@ -60,11 +60,11 @@ Namespace Contensive.AdminNavigator
                         & "OR(ccContent.ID Is Null)" _
                     & "))"
                 End If
-                If ParentCriteria <> "" Then
-                    Criteria = "(" & ParentCriteria & ")AND" & Criteria
+                If Not String.IsNullOrEmpty(ParentCriteria) Then
+                    criteria = "(" & ParentCriteria & ")AND" & criteria
                 End If
                 Dim SelectList As String = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid"
-                getMenuSQL = "select " & SelectList & " from ccMenuEntries where " & Criteria & " order by ccMenuEntries.Name"
+                getMenuSQL = "select " & SelectList & " from ccMenuEntries where " & criteria & " order by ccMenuEntries.Name"
             Catch ex As Exception
                 cp.Site.ErrorReport(ex)
                 Throw
@@ -77,73 +77,43 @@ Namespace Contensive.AdminNavigator
         ''' </summary>
         ''' <param name="cp"></param>
         ''' <returns></returns>
-        Private Shared Function GetContentManagementList(cp As CPBaseClass) As String
-            On Error GoTo ErrorTrap
-            '
-            Dim SQL As String
-            'Dim RS As Recordset
-            Dim CIDArray() As Object
-            Dim CIDCount As Integer
-            Dim CIDPointer As Integer
-            'Dim cdef As CDefType
-            Dim ContentName As String
-            Dim ContentID As Integer
-            Dim ChildIDList As String
-            Dim sqlTablememberRules As String
-            Dim cs As CPCSBaseClass = cp.CSNew
-            '
-            sqlTablememberRules = cp.Content.GetTable("Member Rules")
-            '
-            SQL = "Select ccGroupRules.ContentID as ID" _
-                & " FROM ((" & sqlTablememberRules _
-                & " Left Join ccGroupRules on " & sqlTablememberRules & ".GroupID=ccGroupRules.GroupID)" _
-                & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
-                & " WHERE" _
+        Private Shared Function getContentManagementList(cp As CPBaseClass) As String
+            Try
+                Dim result As String = ""
+                Dim sqlTablememberRules As String = cp.Content.GetTable("Member Rules")
+                Dim SQL As String = "Select ccGroupRules.ContentID as ID" _
+                    & " FROM ((" & sqlTablememberRules _
+                    & " Left Join ccGroupRules on " & sqlTablememberRules & ".GroupID=ccGroupRules.GroupID)" _
+                    & " Left Join ccContent on ccGroupRules.ContentID=ccContent.ID)" _
+                    & " WHERE" _
                     & " (" & sqlTablememberRules & ".MemberID=" & cp.User.Id & ")" _
                     & " AND(ccGroupRules.Active<>0)" _
                     & " AND(ccContent.Active<>0)" _
                     & " AND(" & sqlTablememberRules & ".Active<>0)"
-            If cs.OpenSQL(SQL) Then
-                Do
-                    ContentID = cs.GetInteger("id")
-                    GetContentManagementList = GetContentManagementList & "," & CStr(ContentID)
-                    ContentName = cp.Content.GetRecordName("content", ContentID)
-                    If ContentName <> "" Then
-                        ChildIDList = cp.Content.GetProperty(ContentName, "ChildIDList")
-                        If ChildIDList <> "" Then
-                            GetContentManagementList = GetContentManagementList & "," & ChildIDList
-                        End If
+                Using cs As CPCSBaseClass = cp.CSNew
+                    If cs.OpenSQL(SQL) Then
+                        Do
+                            Dim ContentID As Integer = cs.GetInteger("id")
+                            result &= "," & CStr(ContentID)
+                            Dim contentName As String = cp.Content.GetRecordName("content", ContentID)
+                            If Not String.IsNullOrEmpty(contentName) Then
+                                Dim ChildIDList As String = cp.Content.GetProperty(contentName, "ChildIDList")
+                                If Not String.IsNullOrEmpty(ChildIDList) Then
+                                    result &= "," & ChildIDList
+                                End If
+                            End If
+                            Call cs.GoNext()
+                        Loop While cs.OK
                     End If
-                    Call cs.GoNext()
-                Loop While cs.OK
-            End If
-            Call cs.Close()
-            ''
-            'RS = Main.openRSSQL("Default", SQL)
-            'If IsRSOK(RS) Then
-            '    CIDArray = RS.GetRows()
-            '    CIDCount = UBound(CIDArray, 2) + 1
-            'End If
-            'RS = Nothing
-            'For CIDPointer = 0 To CIDCount - 1
-            '    ContentID = cp.Utils.EncodeInteger(CIDArray(0, CIDPointer))
-            '    GetContentManagementList = GetContentManagementList & "," & CStr(ContentID)
-            '    ContentName = Main.GetContentNameByID(ContentID)
-            '    If ContentName <> "" Then
-            '        ChildIDList = Main.GetContentProperty(ContentName, "ChildIDList")
-            '        'cdef = Main.GetContentDefinition(ContentName)
-            '        If ChildIDList <> "" Then
-            '            GetContentManagementList = GetContentManagementList & "," & ChildIDList
-            '        End If
-            '    End If
-            'Next
-            If Len(GetContentManagementList) > 1 Then
-                GetContentManagementList = Mid(GetContentManagementList, 2)
-            End If
-            '
-            Exit Function
-ErrorTrap:
-            Call cp.Site.ErrorReport("")
+                    Call cs.Close()
+                End Using
+                If Len(result) > 1 Then result = Mid(result, 2)
+                '
+                Return result
+            Catch ex As Exception
+                Call cp.Site.ErrorReport("")
+                Throw
+            End Try
         End Function
     End Class
 End Namespace

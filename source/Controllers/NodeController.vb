@@ -2,11 +2,37 @@
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class NodeController
+    Public NotInheritable Class NodeController
         '
         '====================================================================================================
-        '
-        Friend Shared Function GetNode(cp As CPBaseClass,
+        ''' <summary>
+        ''' get a single node and its children
+        ''' </summary>
+        ''' <param name="cp"></param>
+        ''' <param name="env"></param>
+        ''' <param name="CollectionID"></param>
+        ''' <param name="ContentControlID"></param>
+        ''' <param name="helpCollectionID"></param>
+        ''' <param name="HelpAddonID"></param>
+        ''' <param name="ContentID"></param>
+        ''' <param name="link"></param>
+        ''' <param name="addon"></param>
+        ''' <param name="ignore"></param>
+        ''' <param name="Name"></param>
+        ''' <param name="xEmptyNodeList"></param>
+        ''' <param name="NavigatorID"></param>
+        ''' <param name="NavIconType"></param>
+        ''' <param name="NavIconTitleHtmlEncoded"></param>
+        ''' <param name="AutoManageAddons"></param>
+        ''' <param name="NodeType"></param>
+        ''' <param name="NewWindow"></param>
+        ''' <param name="BlockSubNodes"></param>
+        ''' <param name="xOpenNodeList"></param>
+        ''' <param name="NodeIDString"></param>
+        ''' <param name="Return_NavigatorJS"></param>
+        ''' <param name="linkSuffixList"></param>
+        ''' <returns></returns>
+        Friend Shared Function getNode(cp As CPBaseClass,
                                  env As ApplicationEnvironmentModel,
                                  CollectionID As Integer,
                                  ContentControlID As Integer,
@@ -48,12 +74,12 @@ Namespace Contensive.AdminNavigator
                 Dim BlockNode As Boolean = False
                 Return_NavigatorJS = ""
                 WorkingName = Name
-                IsVisible = (CollectionID <> 0) Or (helpCollectionID <> 0) Or (HelpAddonID <> 0) Or (ContentID <> 0) Or (link <> "") Or (addon IsNot Nothing) Or (LCase(WorkingName) = "all content") Or (LCase(WorkingName) = "add-ons with no collection")
+                IsVisible = (CollectionID <> 0) Or (helpCollectionID <> 0) Or (HelpAddonID <> 0) Or (ContentID <> 0) Or Not String.IsNullOrEmpty(link) Or (addon IsNot Nothing) Or (LCase(WorkingName) = "all content") Or (LCase(WorkingName) = "add-ons with no collection")
                 If Not IsVisible Then
                     '
                     ' IsVisible if it is not in the EmptyNodeList (has child entries)
                     '
-                    IsVisible = (InStr(1, "," & env.EmptyNodeList & ",", "," & NavigatorID & ",") = 0)
+                    IsVisible = (InStr(1, "," & env.emptyNodeList & ",", "," & NavigatorID & ",") = 0)
                 End If
                 If IsVisible Then
                     '
@@ -193,7 +219,7 @@ Namespace Contensive.AdminNavigator
                     '
                     ' setup link
                     '
-                    If link <> "" Then
+                    If Not String.IsNullOrEmpty(link) Then
                         NavLinkHTMLId = "n" & NavigatorID
                         workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                         If NewWindow Then
@@ -229,8 +255,8 @@ Namespace Contensive.AdminNavigator
                                 End If
                                 'link = env.adminUrl & "?" & RequestNameRemoteMethodAddon & "=" & cp.Utils.EncodeRequestVariable(AddonName)
                             End If
-                            If link = "" Then
-                                If AddonGuid <> "" Then
+                            If String.IsNullOrEmpty(link) Then
+                                If Not String.IsNullOrEmpty(AddonGuid) Then
                                     link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "addonguid", AddonGuid, True)
                                 Else
                                     link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "addonid", CStr(addon.id), True)
@@ -287,10 +313,10 @@ Namespace Contensive.AdminNavigator
                                     WorkingName = collectionName
                                     link = collectionHelpLink
                                     workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
-                                    If link <> "" Then
+                                    If Not String.IsNullOrEmpty(link) Then
                                         BlockNode = False
                                         NewWindow = True
-                                    ElseIf (collectionHelp <> "") Then
+                                    ElseIf Not String.IsNullOrEmpty(collectionHelp) Then
                                         BlockNode = False
                                         link = cp.Utils.ModifyLinkQueryString(env.adminUrl, "helpcollectionid", CStr(helpCollectionID), True)
                                     End If
@@ -323,19 +349,19 @@ Namespace Contensive.AdminNavigator
                             DivIDContent = DivIDBase & "c"
                             DivIDEmpty = DivIDBase & "d"
 
-                            If (ContentID = 0) And (InStr(1, env.EmptyNodeList & ",", "," & NodeIDString & ",") <> 0) Then
+                            If (ContentID = 0) And (InStr(1, env.emptyNodeList & ",", "," & NodeIDString & ",") <> 0) Then
                                 '
                                 ' In EmptyNodeList
                                 '
                                 result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
-                            ElseIf InStr(1, env.OpenNodeList & ",", "," & NodeIDString & ",") <> 0 Then
+                            ElseIf InStr(1, env.openNodeList & ",", "," & NodeIDString & ",") <> 0 Then
                                 Dim NodeNavigatorJS As String = ""
                                 '
                                 ' This node is open
                                 '
                                 SubNav = NodeListController.getNodeList(cp, env, NodeIDString, NodeNavigatorJS)
                                 Return_NavigatorJS &= NodeNavigatorJS
-                                If SubNav <> "" Then
+                                If Not String.IsNullOrEmpty(SubNav) Then
                                     '
                                     ' display the subnav
                                     '
@@ -349,7 +375,8 @@ Namespace Contensive.AdminNavigator
                                     '
                                     ' it has a NO subnav
                                     '
-                                    result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
+                                    ' -- what happens if we don't display empty nodes
+                                    'result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
                                 End If
                             Else
                                 '

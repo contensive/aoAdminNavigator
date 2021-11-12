@@ -3,7 +3,7 @@ Imports Contensive.BaseClasses
 Imports Contensive.Models.Db
 
 Namespace Contensive.AdminNavigator
-    Public Class NodeListMixedController
+    Public NotInheritable Class NodeListMixedController
         '
         '====================================================================================================
         ''' <summary>
@@ -24,7 +24,6 @@ Namespace Contensive.AdminNavigator
         Friend Shared Function getNodeListMixed(cp As CPBaseClass, env As ApplicationEnvironmentModel, xEmptyNodeList As String, TopParentNode As String, AutoManageAddons As Boolean, NodeType As NodeTypeEnum, xOpenNodeList As String, AddonNavTypeID As Integer, MenuParentNodeID As Integer, AdminNavIconTypeSetting As Integer, ByRef Return_DraggableJS As String) As String
             Dim returnNav As String = ""
             Try
-                Dim NodeDraggableJS As String
                 Dim lastName As String
                 Dim sortedNodes As New List(Of KeyValuePair(Of String, SortNodeType))
                 Dim SortPtr As Integer
@@ -34,8 +33,8 @@ Namespace Contensive.AdminNavigator
                 '
                 ' list mixed nodes (settings/reports/tools), includes menu nodes and addons with type='setting' sorted in
                 '
-                If InStr(1, env.EmptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
-                    env.EmptyNodeList = env.EmptyNodeList
+                If InStr(1, env.emptyNodeList & ",", "," & TopParentNode & ",") <> 0 Then
+                    '
                 Else
                     '
                     ' Add addons to node list
@@ -51,7 +50,7 @@ Namespace Contensive.AdminNavigator
                         ' for Manage Addons node, admin is needed for non-developer
                         '
                         If Not cp.User.IsDeveloper() Then
-                            Criteria = Criteria & "and(admin<>0)"
+                            Criteria &= "and(admin<>0)"
                         End If
                     End If
                     Using cs10 As CPCSBaseClass = cp.CSNew
@@ -102,7 +101,7 @@ Namespace Contensive.AdminNavigator
                                     sortNode.NavIconTitle = nodeName
                                 End If
                                 sortedNodes.Add(New KeyValuePair(Of String, SortNodeType)(nodeName, sortNode))
-                                SortPtr = SortPtr + 1
+                                SortPtr += 1
                                 Call cs11.GoNext()
                             Loop While cs11.OK
                         End If
@@ -115,7 +114,7 @@ Namespace Contensive.AdminNavigator
                         '
                         ' Empty list, add to env.EmptyNodeList
                         '
-                        env.EmptyNodeList = env.EmptyNodeList & "," & TopParentNode
+                        env.emptyNodeList &= "," & TopParentNode
                     Else
                         lastName = ""
                         Dim contentNodeList As String = ""
@@ -123,19 +122,20 @@ Namespace Contensive.AdminNavigator
                             Dim nodeName As String = kvp.Key.ToLowerInvariant()
                             If nodeName <> lastName Then
                                 Dim sortedNode As SortNodeType = kvp.Value
+                                Dim NodeDraggableJS As String = ""
                                 If (Not sortedNode.contentID.Equals(0)) Then
                                     '
                                     ' -- content nodes last
-                                    contentNodeList &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, Nothing, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
+                                    contentNodeList &= NodeController.getNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, Nothing, 0, sortedNode.Name, env.emptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.openNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
                                 ElseIf (sortedNode.addonid.Equals(0)) Then
                                     '
                                     ' -- hard-coded nodes
-                                    returnNav &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, Nothing, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
+                                    returnNav &= NodeController.getNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, Nothing, 0, sortedNode.Name, env.emptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.openNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
                                 Else
                                     '
                                     ' -- addon nodes next
                                     Dim addon As AddonModel = DbBaseModel.create(Of AddonModel)(cp, sortedNode.addonid)
-                                    returnNav &= NodeController.GetNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, addon, 0, sortedNode.Name, env.EmptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.OpenNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
+                                    returnNav &= NodeController.getNode(cp, env, sortedNode.CollectionID, sortedNode.ContentControlID, sortedNode.helpCollectionID, sortedNode.HelpAddonID, sortedNode.contentID, sortedNode.Link, addon, 0, sortedNode.Name, env.emptyNodeList, sortedNode.NavigatorID, sortedNode.NavIconType, cp.Utils.EncodeHTML(sortedNode.NavIconTitle), AutoManageAddons, NodeType, sortedNode.NewWindow, BlockSubNodes, env.openNodeList, sortedNode.NodeIDString, NodeDraggableJS, "")
                                 End If
                                 Return_DraggableJS &= NodeDraggableJS
                                 lastName = nodeName

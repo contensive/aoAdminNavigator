@@ -20,14 +20,12 @@ Namespace Contensive.AdminNavigator
         Public Shared Function getNode(ByVal CP As CPBaseClass, env As ApplicationEnvironmentModel) As String
             Try
                 Dim parentNode As String = CP.Doc.GetText("nodeid")
-                If (parentNode <> "") Then
-                    If String.IsNullOrEmpty(env.OpenNodeList) Then
-                        env.OpenNodeList = "," & parentNode
-                        Call CP.Visit.SetProperty("AdminNavOpenNodeList", env.OpenNodeList)
+                If Not String.IsNullOrEmpty(parentNode) Then
+                    If String.IsNullOrEmpty(env.openNodeList) Then
+                        env.openNodeList = "," & parentNode
                     Else
-                        If ((env.OpenNodeList & ",").IndexOf("," & parentNode.ToString & ",") < 0) Then
-                            env.OpenNodeList = env.OpenNodeList & "," & parentNode
-                            Call CP.Visit.SetProperty("AdminNavOpenNodeList", env.OpenNodeList)
+                        If ((env.openNodeList & ",").IndexOf("," & parentNode.ToString & ",") < 0) Then
+                            env.openNodeList = env.openNodeList & "," & parentNode
                         End If
                     End If
                 End If
