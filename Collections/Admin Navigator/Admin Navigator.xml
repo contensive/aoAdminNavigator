@@ -6,7 +6,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.adminNavigator.GetFullClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.adminNavigator.AdminNavigatorAddon]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -47,7 +47,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass>Contensive.AdminNavigator.CloseNodeClass</DotNetClass>
+		<DotNetClass>Contensive.AdminNavigator.CloseNodeRemote</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -89,7 +89,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass><![CDATA[Contensive.adminNavigator.GetNodeClass]]></DotNetClass>
+		<DotNetClass><![CDATA[Contensive.adminNavigator.GetNodeRemote]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>
@@ -129,7 +129,7 @@
 		<Copy></Copy>
 		<CopyText></CopyText>
 		<ActiveXProgramID></ActiveXProgramID>
-		<DotNetClass>Contensive.AdminNavigator.OpenNodeClass</DotNetClass>
+		<DotNetClass>Contensive.AdminNavigator.OpenNodeRemote</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
 		<Filter>No</Filter>

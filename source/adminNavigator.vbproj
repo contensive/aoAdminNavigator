@@ -76,10 +76,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ContensiveDbModels, Version=4.1.2.0, Culture=neutral, PublicKeyToken=c014b235a9c6bb22, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.DbModels.21.8.4.1\lib\net472\ContensiveDbModels.dll</HintPath>
+      <HintPath>packages\Contensive.DbModels.22.8.16.1\lib\net472\ContensiveDbModels.dll</HintPath>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb, processorArchitecture=MSIL">
-      <HintPath>packages\Contensive.CPBaseClass.21.8.4.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>packages\Contensive.CPBaseClass.22.8.16.1\lib\net472\CPBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -102,10 +102,11 @@
     <Compile Include="Controllers\MenuSqlController.vb" />
     <Compile Include="Controllers\NodeListMixedController.vb" />
     <Compile Include="Controllers\NodeManageAddonsController.vb" />
-    <Compile Include="Addons\CloseNodeClass.vb" />
-    <Compile Include="Addons\OpenNodeClass.vb" />
-    <Compile Include="Addons\GetFullClass.vb" />
-    <Compile Include="Addons\GetNodeClass.vb" />
+    <Compile Include="Addons\CloseNodeRemote.vb" />
+    <Compile Include="Addons\OpenNodeRemote.vb" />
+    <Compile Include="Addons\AdminNavigatorAddon.vb" />
+    <Compile Include="Addons\GetNodeRemote.vb" />
+    <Compile Include="Models\DataViewModel.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

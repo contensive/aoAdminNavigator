@@ -3,7 +3,7 @@ Imports System.Linq
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class OpenNodeClass
+    Public Class OpenNodeRemote
         Inherits AddonBaseClass
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object

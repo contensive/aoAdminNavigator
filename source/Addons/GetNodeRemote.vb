@@ -2,7 +2,7 @@
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class GetNodeClass
+    Public Class GetNodeRemote
         Inherits AddonBaseClass
         '
         '====================================================================================================

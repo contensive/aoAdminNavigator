@@ -4,7 +4,7 @@ Imports System.Text
 Imports Contensive.BaseClasses
 
 Namespace Contensive.AdminNavigator
-    Public Class GetFullClass
+    Public Class AdminNavigatorAddon
         Inherits AddonBaseClass
         '
         Public Overrides Function Execute(ByVal CP As CPBaseClass) As Object
@@ -18,7 +18,7 @@ Namespace Contensive.AdminNavigator
                         CP.Doc.SetProperty("nodeid", "0")
                         Dim AdminNavContentOpened As String = "" _
                             & cr & "<div id=""AdminNavContentOpened"" class=""opened"">" _
-                            & kmaIndent(GetNodeClass.getNode(CP, env) _
+                            & kmaIndent(GetNodeRemote.getNode(CP, env) _
                             & "<img alt=""space"" src=""https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/images/spacer.gif"" width=""200"" height=""1"" style=""clear:both"">") _
                             & cr & "</div>" _
                             & ""
