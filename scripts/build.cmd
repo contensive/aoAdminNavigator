@@ -9,7 +9,7 @@ rem
 rem Setup deployment folder
 rem
 
-set appName=vivos
+
 set majorVersion=5
 set minorVersion=1
 set collectionName=Admin Navigator

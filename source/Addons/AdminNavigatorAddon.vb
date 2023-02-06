@@ -12,7 +12,7 @@ Namespace Contensive.AdminNavigator
                 Using env As New ApplicationEnvironmentModel(CP)
                     Dim AdminNavContent As String
                     Dim AdminNavHead As String
-                    If env.adminNavOpen Then
+                    If env.adminNavOpen And env.allowAdminNavSaveState Then
                         '
                         ' draw the page with Nav Opened
                         CP.Doc.SetProperty("nodeid", "0")
@@ -86,7 +86,7 @@ Namespace Contensive.AdminNavigator
                         & kmaIndent(AdminNavHead) _
                         & kmaIndent(AdminNavContent) _
                         & cr & "</div>" _
-                        & ""
+                        & "<input type=""hidden"" name=""allowAdminNavSaveState"" value=""" & If(env.allowAdminNavSaveState, "true", "false") & """>"
                     Return returnHtml
                 End Using
             Catch ex As Exception

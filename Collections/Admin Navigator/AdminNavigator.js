@@ -117,7 +117,16 @@ function closeAdminNav() {
 	SetDisplay('AdminNavContentOpened','none');
 	SetDisplay('AdminNavHeadClosed','block');
 	SetDisplay('AdminNavContentClosed','block');
-	cj.ajax.setVisitProperty('','AdminNavOpen','0')
+	// var allowSaveState = true;
+	// var $allowSaveStateInput=$('input[name=allowAdminNavSaveState');
+	// console.log('$allowSaveStateInput.length [' + $allowSaveStateInput.length + ']');
+	// if($allowSaveStateInput.length && $allowSaveStateInput.val()=='false') {
+	// 	allowSaveState=false;
+	// }
+	// console.log('allowSaveState [' + allowSaveState + ']');
+	//if (allowSaveState) { 
+		cj.ajax.setVisitProperty('','AdminNavOpen','0'); 
+	//}
 }
 /* 
 * close nav when created open
