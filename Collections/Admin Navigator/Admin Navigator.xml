@@ -5,7 +5,6 @@
 	<Addon name="Admin Navigator" guid="{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass><![CDATA[Contensive.adminNavigator.AdminNavigatorAddon]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
@@ -46,7 +45,6 @@
 	<Addon name="AdminNavigatorCloseNode" guid="{F466E4E3-807B-48A4-9AFD-3AC67065BC34}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass>Contensive.AdminNavigator.CloseNodeRemote</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
@@ -88,7 +86,6 @@
 	<Addon name="AdminNavigatorGetNode" guid="{2CC46760-D008-4413-B2B2-2EA9CE8BC6E9}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass><![CDATA[Contensive.adminNavigator.GetNodeRemote]]></DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
@@ -128,7 +125,6 @@
 	<Addon name="AdminNavigatorOpenNode" guid="{236D0E88-A1DC-4289-A678-35261307AFA9}" type="Add-on">
 		<Copy></Copy>
 		<CopyText></CopyText>
-		<ActiveXProgramID></ActiveXProgramID>
 		<DotNetClass>Contensive.AdminNavigator.OpenNodeRemote</DotNetClass>
 		<ArgumentList></ArgumentList>
 		<AsAjax>No</AsAjax>
