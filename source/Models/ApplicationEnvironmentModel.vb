@@ -190,7 +190,7 @@ Namespace Contensive.AdminNavigator
         '
         Public ReadOnly Property allowAdminNavSaveState As Boolean
             Get
-                Return cp.Site.GetBoolean("adminNav allowSaveState", True)
+                Return cp.Site.GetBoolean("adminNav allowSaveState", False)
             End Get
         End Property
         '
