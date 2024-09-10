@@ -11,6 +11,7 @@ Namespace Contensive.AdminNavigator
         ''' </summary>
         Friend Shared Function getNodeList(cp As CPBaseClass, env As ApplicationEnvironmentModel, ParentNode As String, ByRef Return_NavigatorJS As String) As String
             Dim returnNav As String = ""
+            Dim hint As Integer = 0
             Try
                 Dim TopParentNode As String = ParentNode
                 Dim parentNodeStack() As String
@@ -193,29 +194,41 @@ Namespace Contensive.AdminNavigator
                             Dim dataRecordName As String
                             Dim dataRecordCdefName As String
                             Dim dataRecordCdefID As Integer
-                            Dim sqlCriteria As String = ""
 
                             If cs7.Open("add-on collections", "id=" & CollectionID) Then
                                 dataRecordList = cs7.GetText("dataRecordList")
                             End If
                             Call cs7.Close()
+                            hint = 1100
                             If Not String.IsNullOrEmpty(dataRecordList) Then
-                                dataRecords.AddRange(dataRecordList.Split(vbCrLf.ToCharArray))
-                                For Each dataRecord As String In dataRecords
-                                    dataRecordParts = dataRecord.Split(",".ToCharArray)
-                                    dataRecordCdefName = dataRecordParts(0)
-                                    If Not String.IsNullOrEmpty(dataRecordCdefName) Then
+                                Try
+                                    dataRecords.AddRange(dataRecordList.Split(vbCrLf.ToCharArray))
+                                    For Each dataRecord As String In dataRecords
+                                        dataRecordParts = dataRecord.Split(",".ToCharArray)
+                                        dataRecordCdefName = dataRecordParts(0)
                                         dataRecordCdefID = cp.Content.GetID(dataRecordCdefName)
-                                        If dataRecordCdefID <> 0 Then
-                                            sqlCriteria = ""
-                                            If dataRecordParts.Length >= 2 Then
-                                                ' 
-                                                ' contentname,(id or guid)
-                                                '
-                                                If dataRecordParts(1).Substring(0, 1) = "{" Then
-                                                    sqlCriteria = "ccguid=" & cp.Db.EncodeSQLText(dataRecordParts(1))
-                                                Else
-                                                    sqlCriteria = "name=" & cp.Db.EncodeSQLText(dataRecordParts(1))
+                                        If dataRecordCdefID = 0 Then
+                                            ' -- invalid content, skip it
+                                        Else
+                                            ' -- export records from this content
+                                            Dim sqlCriteria As String = ""
+                                            If String.IsNullOrEmpty(dataRecordCdefName) Then
+                                                ' -- no comma, export all records
+                                            Else
+                                                If dataRecordParts.Length >= 2 Then
+                                                    hint = 1110
+                                                    ' 
+                                                    ' contentname,(name or guid)
+                                                    If String.IsNullOrEmpty(dataRecordParts(1)) Then
+                                                        ' -- no data given, list all records in export
+                                                    Else
+                                                        If dataRecordParts(1).Substring(0, 1) = "{" Then
+                                                            sqlCriteria = "ccguid=" & cp.Db.EncodeSQLText(dataRecordParts(1))
+                                                        Else
+                                                            sqlCriteria = "name=" & cp.Db.EncodeSQLText(dataRecordParts(1))
+                                                        End If
+                                                    End If
+                                                    hint = 1120
                                                 End If
                                             End If
                                             If cs7.Open(dataRecordCdefName, sqlCriteria) Then
@@ -236,16 +249,19 @@ Namespace Contensive.AdminNavigator
                                             End If
                                             Call cs7.Close()
                                         End If
+                                    Next
+                                    hint = 1100
+                                    '
+                                    If DupsFound Then
+                                        SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
+                                        SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
+                                        Call cp.Db.ExecuteNonQuery(SQL)
                                     End If
-                                Next
+                                    Call cp.Cache.Store(cacheName, nodeHtml, Now.AddHours(1), env.cacheDependencyList)
+                                Catch ex As Exception
+                                    cp.Site.ErrorReport(ex, $"Error creating nodes for Data Records, continuing")
+                                End Try
                             End If
-                            '
-                            If DupsFound Then
-                                SQL = "select b.id from ccAddonCollectionCDefRules a,ccAddonCollectionCDefRules b where (a.id<b.id) and (a.contentid=b.contentid) and (a.collectionid=b.collectionid)"
-                                SQL = "delete from ccAddonCollectionCDefRules where id in (" & SQL & ")"
-                                Call cp.Db.ExecuteNonQuery(SQL)
-                            End If
-                            Call cp.Cache.Store(cacheName, nodeHtml, Now.AddHours(1), env.cacheDependencyList)
                         End If
                         returnNav &= nodeHtml
                     Case NodeIDManageAddonsAdvanced
@@ -500,7 +516,7 @@ Namespace Contensive.AdminNavigator
                 End If
                 Return returnNav
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cp.Site.ErrorReport(ex, $"hint [{hint}]")
                 Throw
             End Try
         End Function

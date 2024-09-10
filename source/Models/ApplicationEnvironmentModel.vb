@@ -15,15 +15,21 @@ Namespace Contensive.AdminNavigator
         ''' <returns></returns>
         Public ReadOnly Property adminUrl As String
             Get
-                If adminUrl_local IsNot Nothing Then Return adminUrl_local
-                adminUrl_local = cp.Site.GetText("adminurl")
-                If String.IsNullOrEmpty(adminUrl_local) Then Return ""
-                If adminUrl_local.Substring(0, 1) <> "/" Then adminUrl_local = "/" & adminUrl_local
-                If adminUrl_local.Length = 1 Then Return adminUrl_local
-                Do While adminUrl_local.Length > 0 AndAlso adminUrl_local.Substring(adminUrl_local.Length - 1, 1) = "/"
-                    adminUrl_local = adminUrl_local.Substring(0, adminUrl_local.Length - 1)
-                Loop
-                Return adminUrl_local
+                Try
+                    If adminUrl_local IsNot Nothing Then Return adminUrl_local
+                    adminUrl_local = cp.Site.GetText("adminurl")
+                    If String.IsNullOrEmpty(adminUrl_local) Then Return ""
+                    If adminUrl_local.Substring(0, 1) <> "/" Then adminUrl_local = "/" & adminUrl_local
+                    If adminUrl_local.Length = 1 Then Return adminUrl_local
+                    Do While adminUrl_local.Length > 0 AndAlso adminUrl_local.Substring(adminUrl_local.Length - 1, 1) = "/"
+                        adminUrl_local = adminUrl_local.Substring(0, adminUrl_local.Length - 1)
+                    Loop
+                    Return adminUrl_local
+
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex, $"hint adminUrl")
+                    Throw
+                End Try
             End Get
         End Property
         Private adminUrl_local As String = Nothing
@@ -136,25 +142,30 @@ Namespace Contensive.AdminNavigator
         ''' </summary>
         Public Property emptyNodeList As String
             Get
-                If emptyNodeList_local IsNot Nothing Then Return emptyNodeList_local
-                '
-                ' -- read cache version, return if not empty
-                emptyNodeList_local = cp.Cache.GetText(emptyNodeListCacheKey)
-                If Not String.IsNullOrEmpty(emptyNodeList_local) Then Return emptyNodeList_local
-                '
-                ' -- build a new string, store in cache and return
-                Dim SQL As String = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
-                Dim cs2 As CPCSBaseClass = cp.CSNew()
-                If cs2.OpenSQL(SQL) Then
-                    Do
-                        emptyNodeList_local &= "," & cs2.GetText("id")
-                        Call cs2.GoNext()
-                    Loop While cs2.OK()
-                    emptyNodeList_local = emptyNodeList_local.Substring(1)
-                End If
-                Call cs2.Close()
-                Call cp.Cache.Store(emptyNodeListCacheKey, emptyNodeList_local, cacheDependencyList)
-                Return emptyNodeList_local
+                Try
+                    If emptyNodeList_local IsNot Nothing Then Return emptyNodeList_local
+                    '
+                    ' -- read cache version, return if not empty
+                    emptyNodeList_local = cp.Cache.GetText(emptyNodeListCacheKey)
+                    If Not String.IsNullOrEmpty(emptyNodeList_local) Then Return emptyNodeList_local
+                    '
+                    ' -- build a new string, store in cache and return
+                    Dim SQL As String = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id"
+                    Dim cs2 As CPCSBaseClass = cp.CSNew()
+                    If cs2.OpenSQL(SQL) Then
+                        Do
+                            emptyNodeList_local &= "," & cs2.GetText("id")
+                            Call cs2.GoNext()
+                        Loop While cs2.OK()
+                        emptyNodeList_local = emptyNodeList_local.Substring(1)
+                    End If
+                    Call cs2.Close()
+                    Call cp.Cache.Store(emptyNodeListCacheKey, emptyNodeList_local, cacheDependencyList)
+                    Return emptyNodeList_local
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex, $"hint emptyNodeList")
+                    Throw
+                End Try
             End Get
             Set(value As String)
                 Call cp.Cache.Store(emptyNodeListCacheKey, value, cacheDependencyList)

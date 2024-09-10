@@ -39,13 +39,17 @@ function AdminNavCloseClick(OffNode,OnNode,ContentNode,NodeID,EmptyNode) {
 		cj.ajax.addon('AdminNavigatorCloseNode','nodeid='+NodeID);
 }
 /*
-*	bind nodes
+*	moved to dashboard.js to keep it together. kept this incase dash updated and not adminNav
 */
 function navBindNodes() {
+	if(!dashBindNavNodes) {
+		/* dashBindNavNodes installed, navDrag binding already handled */
+	}
 	jQuery(".navDrag").each(function(){
 		jQuery(this).draggable({
 			stop: function(event, ui){
-				navDrop(this.id,ui.position.left,ui.position.top);
+				console.log("adminNav.navBindNodes draggable:stop");
+				navDrop(this.id,ui.offset.left,ui.offset.top);
 			}
 			,helper: "clone"
 			,revert: "invalid"
@@ -56,10 +60,6 @@ function navBindNodes() {
 		});
 	});	
 }
-
-/*
-* OnReady
-*/
 jQuery( document ).ready(function(){
 	/*
 	* bind to icon nodes

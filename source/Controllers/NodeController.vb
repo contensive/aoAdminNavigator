@@ -56,6 +56,7 @@ Namespace Contensive.AdminNavigator
                                  ByRef Return_NavigatorJS As String,
                                  linkSuffixList As String
                                  ) As String
+            Dim hint As Integer = 0
             Try
                 Dim SubNav As String
                 Dim DivIDClosed As String
@@ -228,10 +229,12 @@ Namespace Contensive.AdminNavigator
                             workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & link & """ title=""Open '" & workingNameHtmlEncoded & "'"">" & workingNameHtmlEncoded & "</a>"
                         End If
                     Else
+                        hint = 1000
                         '
                         ' If link page, use this
                         '
                         If (addon IsNot Nothing) Then
+                            hint = 1010
                             '
                             ' link to addon
                             '
@@ -239,6 +242,7 @@ Namespace Contensive.AdminNavigator
                             AddonGuid = addon.ccguid
                             AddonName = addon.name
                             If addon.remoteMethod Then
+                                hint = 1020
                                 NewWindow = True
                                 '
                                 ' -- url encode, but encode space as %20, not plus
@@ -246,6 +250,7 @@ Namespace Contensive.AdminNavigator
                                     link &= "%20" & cp.Utils.EncodeUrl(linkPart)
                                 Next
                                 link = link.Substring(3)
+                                hint = 1030
                                 '
                                 If Not String.IsNullOrEmpty(link) Then
                                     link = link.Replace("\", "/")
@@ -253,6 +258,7 @@ Namespace Contensive.AdminNavigator
                                         link = "/" & link
                                     End If
                                 End If
+                                hint = 1040
                                 'link = env.adminUrl & "?" & RequestNameRemoteMethodAddon & "=" & cp.Utils.EncodeRequestVariable(AddonName)
                             End If
                             If String.IsNullOrEmpty(link) Then
@@ -276,6 +282,7 @@ Namespace Contensive.AdminNavigator
                                 workingNameHtmlEncoded &= "<i data-tooltip=""" & AddonGuid & """ class=""contensiveToolTip fas fa-info-circle"" href=""#"" data-toggle=""tooltip"" data-html=""true"" rel=""tooltip"" title=""Click for details.""></i>"
                             End If
                         ElseIf ContentID <> 0 Then
+                            hint = 2000
                             '
                             ' go edit the content
                             '
@@ -288,6 +295,7 @@ Namespace Contensive.AdminNavigator
                                 workingNameHtmlEncoded = "<a class=navDrag name=navLink id=""" & NavLinkHTMLId & """ href=""" & link & """ title=""List All '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
                             End If
                         ElseIf HelpAddonID <> 0 Then
+                            hint = 3000
                             '
                             ' go to Addon Help
                             '
@@ -299,6 +307,7 @@ Namespace Contensive.AdminNavigator
                                 workingNameHtmlEncoded = "<a href=""" & link & """ title=""Help for Add-on '" & NavIconTitleHtmlEncoded & "'"">" & NavIconTitleHtmlEncoded & "</a>"
                             End If
                         ElseIf helpCollectionID <> 0 Then
+                            hint = 4000
                             '
                             ' go to Collection Help
                             '
@@ -332,17 +341,22 @@ Namespace Contensive.AdminNavigator
                                 cs13.Close()
                             End Using
                         Else
+                            hint = 5000
                             workingNameHtmlEncoded = cp.Utils.EncodeHTML(WorkingName)
                         End If
                     End If
+                    hint = 6000
                     '
                     If Not BlockNode Then
+                        hint = 6010
                         If BlockSubNodes Or (addon IsNot Nothing) Then
+                            hint = 6020
                             '
                             ' This is a hardcoded item (like Add-on), it has no subnodes
                             '
                             result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
                         Else
+                            hint = 6030
                             '
                             DivIDClosed = DivIDBase & "a"
                             DivIDOpened = DivIDBase & "b"
@@ -350,11 +364,13 @@ Namespace Contensive.AdminNavigator
                             DivIDEmpty = DivIDBase & "d"
 
                             If (ContentID = 0) And (InStr(1, env.emptyNodeList & ",", "," & NodeIDString & ",") <> 0) Then
+                                hint = 6040
                                 '
                                 ' In EmptyNodeList
                                 '
                                 result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
                             ElseIf InStr(1, env.openNodeList & ",", "," & NodeIDString & ",") <> 0 Then
+                                hint = 6050
                                 Dim NodeNavigatorJS As String = ""
                                 '
                                 ' This node is open
@@ -379,6 +395,7 @@ Namespace Contensive.AdminNavigator
                                     'result &= cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & IconNoSubNodes & workingNameHtmlEncoded & linkSuffixList & "</div>"
                                 End If
                             Else
+                                hint = 6060
                                 '
                                 ' This node is closed
                                 '
@@ -393,7 +410,7 @@ Namespace Contensive.AdminNavigator
                 '
                 Return result
             Catch ex As Exception
-                cp.Site.ErrorReport(ex)
+                cp.Site.ErrorReport(ex, $"NodeController.getNode, hint [{hint}]")
                 Throw
             End Try
         End Function
