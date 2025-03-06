@@ -16,7 +16,7 @@ set collectionName=Admin Navigator
 set collectionPath=..\collections\Admin Navigator\
 set solutionName=adminNavigator.sln
 set binPath=..\source\bin\debug\
-set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
+set msbuildLocation=C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\
 set deploymentFolderRoot=C:\Deployments\aoadminNavigator\Dev\
 
 
