@@ -167,7 +167,5 @@
 		</Scripting>
 	</Addon>
 	<ImportCollection name="JQuery">{A435BF70-041B-43D1-8A8D-5D9D59A7FCD0}</ImportCollection>
-	<Resource name="AdminNavigator.js" type="www" path="/AdminNavigator" />
-	<Resource name="AdminNavigator.css" type="www" path="/AdminNavigator" />
-	<Resource name="adminNavigator.dll" type="executable" path="" />
+	<Resource name="wwwFiles.zip" type="wwwFiles" />
 </Collection>
