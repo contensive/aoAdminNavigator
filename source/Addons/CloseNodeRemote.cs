@@ -4,9 +4,13 @@ using Contensive.BaseClasses;
 
 namespace Contensive.AdminNavigator {
     public class CloseNodeRemote : AddonBaseClass {
-        // 
+        //
         public override object Execute(CPBaseClass CP) {
             try {
+                // Authentication required - admin navigation is admin-only
+                if (!CP.User.IsAdmin) {
+                    return string.Empty;
+                }
                 string nodeId = CP.Doc.GetText("nodeid");
                 if (!string.IsNullOrWhiteSpace(nodeId)) {
                     var nodeList = CP.Visit.GetText("AdminNavOpenNodeList", "").Split(',').ToList();

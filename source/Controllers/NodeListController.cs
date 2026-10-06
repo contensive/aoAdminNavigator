@@ -110,10 +110,8 @@ namespace Contensive.AdminNavigator {
                                 // -- block all addons not marked to be on the admin-nav (admin boolean)
                                 // -- big change, developers do not need this long list.
                                 Criteria = "(collectionid=" + CollectionID + ")and(admin>0)";
-                                string NameSuffix;
                                 foreach (AddonModel addon in DbBaseModel.createList<AddonModel>(cp, Criteria, "name")) {
                                     Name = (addon.name ?? "").Trim();
-                                    NameSuffix = "";
                                     string linkSuffixList = "";
                                     if (env.isDeveloper) {
                                         linkSuffixList += "<a href=\"" + env.addonEditAddonUrlPrefix + addon.id + "\">edit</a>";
@@ -186,7 +184,6 @@ namespace Contensive.AdminNavigator {
                                             }
                                             NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name);
                                             ContentControlID = cs7.GetInteger("ContentControlID");
-                                            NameSuffix = "";
                                             nodeHtml += NodeController.getNode(cp, env, 0, ContentControlID, 0, 0, ContentID, "", null, 0, Name, env.emptyNodeList, 0, common.NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeContent, false, true, env.openNodeList, nodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                             Return_NavigatorJS += NodeNavigatorJS;
                                         }
@@ -436,10 +433,9 @@ namespace Contensive.AdminNavigator {
                         }
 
                     default: {
-                            // 
+                            //
                             // numeric node (default case) - list navigator records with parent=TopParentNode
-                            // 
-                            int CS = -1;
+                            //
                             if (int.TryParse(TopParentNode, out _)) {
                                 if ((env.emptyNodeList + ",").IndexOf("," + TopParentNode + ",", StringComparison.Ordinal) >= 0) {
                                     // 
@@ -475,7 +471,6 @@ namespace Contensive.AdminNavigator {
                             ContentID = csChildList.GetInteger("ContentID");
                         }
                         if (ContentID != 0) {
-                            ContentID = ContentID;
                             string ContentName = cp.Content.GetRecordName("content", ContentID);
                             if (!string.IsNullOrEmpty(ContentName)) {
                                 csChildList.Close();
@@ -529,9 +524,6 @@ namespace Contensive.AdminNavigator {
                         NavIconType = csChildList.GetInteger("NavIconType");
                         NavIconTitle = csChildList.GetText("NavIconTitle");
                         int HelpAddonID = csChildList.GetInteger("HelpAddonID");
-                        if (HelpAddonID != 0) {
-                            HelpAddonID = HelpAddonID;
-                        }
                         int helpCollectionID = csChildList.GetInteger("HelpCollectionID");
                         if (string.IsNullOrEmpty(NavIconTitle)) {
                             NavIconTitle = Name;

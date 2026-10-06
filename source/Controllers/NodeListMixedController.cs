@@ -28,19 +28,17 @@ namespace Contensive.AdminNavigator {
                 string lastName;
                 var sortedNodes = new List<KeyValuePair<string, common.SortNodeType>>();
                 var SortPtr = default(int);
-                string NodeIDString;
                 string Criteria;
                 var BlockSubNodes = default(bool);
-                // 
+                //
                 // list mixed nodes (settings/reports/tools), includes menu nodes and addons with type='setting' sorted in
-                // 
+                //
                 if ((env.emptyNodeList + ",").IndexOf("," + TopParentNode + ",", StringComparison.Ordinal) >= 0) {
-                    // 
+                    //
                 } else {
-                    // 
+                    //
                     // Add addons to node list
-                    // 
-                    NodeIDString = "";
+                    //
                     Criteria = "(navtypeid=" + AddonNavTypeID + ")";
                     if (AddonNavTypeID == 2 | AddonNavTypeID == 3 | AddonNavTypeID == 4) {
                         // 

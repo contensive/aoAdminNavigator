@@ -11,6 +11,10 @@ namespace Contensive.AdminNavigator {
         /// <param name="CP"></param>
         /// <returns></returns>
         public override object Execute(CPBaseClass CP) {
+            // Authentication required - admin navigation is admin-only
+            if (!CP.User.IsAdmin) {
+                return string.Empty;
+            }
             return getNode(CP, new ApplicationEnvironmentModel(CP));
         }
         // 

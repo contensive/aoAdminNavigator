@@ -8,15 +8,14 @@ function AdminNavOpenClick(OffNode,OnNode,ContentNode,NodeID,onEmptyShow,onEmpty
 	document.getElementById(OnNode).style.display='block';
 	var e=document.getElementById(ContentNode);
 	if(e.ok) {//already populated
-		cj.ajax.addon('AdminNavigatorOpenNode','nodeid='+NodeID)
+		fetch('/AdminNavigatorOpenNode?nodeid=' + NodeID);
 		navBindNodes();
 	}else{
 		e.ok='ok';
 		var arg = {contentNode:ContentNode};
 		arg.onEmptyHide = onEmptyHide;
 		arg.onEmptyShow = onEmptyShow;
-		cj.ajax.addonCallback("AdminNavigatorGetNode",'nodeid='+NodeID,AdminNavOpenClickCallback,arg);
-		//cj.ajax.addon('AdminNavigatorGetNode','nodeid='+NodeID,'',ContentNode,onEmptyHide,onEmptyShow)
+		fetch('/AdminNavigatorGetNode?nodeid=' + NodeID).then(r => r.text()).then(text => AdminNavOpenClickCallback(text, arg));
 	}
 	e.style.display='block';
 }
@@ -36,20 +35,23 @@ function AdminNavCloseClick(OffNode,OnNode,ContentNode,NodeID,EmptyNode) {
 		document.getElementById(OffNode).style.display='none';
 		document.getElementById(OnNode).style.display='block';
 		document.getElementById(ContentNode).style.display='none';
-		cj.ajax.addon('AdminNavigatorCloseNode','nodeid='+NodeID);
+		fetch('/AdminNavigatorCloseNode?nodeid=' + NodeID);
 }
 /*
 *	moved to dashboard.js to keep it together. kept this incase dash updated and not adminNav
 */
 function navBindNodes() {
-	if(!dashBindNavNodes) {
-		/* dashBindNavNodes installed, navDrag binding already handled */
+	if(typeof dashBindNavNodes !== 'undefined' && dashBindNavNodes) {
+		/* dashBindNavNodes installed, navDrag binding already handled by dashboard.js */
+		return;
 	}
 	jQuery(".navDrag").each(function(){
 		jQuery(this).draggable({
 			stop: function(event, ui){
 				console.log("adminNav.navBindNodes draggable:stop");
-				navDrop(this.id,ui.offset.left,ui.offset.top);
+				if(typeof navDrop === 'function') {
+					navDrop(this.id,ui.offset.left,ui.offset.top);
+				}
 			}
 			,helper: "clone"
 			,revert: "invalid"
@@ -58,7 +60,7 @@ function navBindNodes() {
 			,opacity: 0.50
 			,cursor: "move"
 		});
-	});	
+	});
 }
 jQuery( document ).ready(function(){
 	/*
@@ -79,13 +81,17 @@ function OpenAdminNav() {
 	SetDisplay('AdminNavContentOpened','block');
 	SetDisplay('AdminNavContentMinWidth','block');
 	SetDisplay('AdminNavContentClosed','none');
-	cj.ajax.setVisitProperty('','AdminNavOpen','1');
+	try {
+		localStorage.setItem('AdminNavOpen', '1');
+	} catch(e) {
+		// Ignore localStorage errors (e.g., private browsing mode)
+	}
 	navBindNodes();
 	if(!AdminNavPop){
-		cj.ajax.addonCallback("AdminNavigatorGetNode",'',OpenAdminNavCallback);
+		fetch('/AdminNavigatorGetNode').then(r => r.text()).then(text => OpenAdminNavCallback(text));
 		AdminNavPop=true;
 	}else{
-		cj.ajax.addon('AdminNavigatorOpenNode');
+		fetch('/AdminNavigatorOpenNode');
 	}
 }
 function OpenAdminNavCallback(serverResponse){
@@ -107,7 +113,11 @@ function reCloseAdminNav() {
 	SetDisplay('AdminNavContentOpened','none');
 	SetDisplay('AdminNavContentMinWidth','none');
 	SetDisplay('AdminNavContentClosed','block');
-	cj.ajax.setVisitProperty('','AdminNavOpen','0')
+	try {
+		localStorage.setItem('AdminNavOpen', '0');
+	} catch(e) {
+		// Ignore localStorage errors (e.g., private browsing mode)
+	}
 }
 /* 
 * open nav when created open
@@ -124,8 +134,12 @@ function closeAdminNav() {
 	// 	allowSaveState=false;
 	// }
 	// console.log('allowSaveState [' + allowSaveState + ']');
-	//if (allowSaveState) { 
-		cj.ajax.setVisitProperty('','AdminNavOpen','0'); 
+	//if (allowSaveState) {
+		try {
+			localStorage.setItem('AdminNavOpen', '0');
+		} catch(e) {
+			// Ignore localStorage errors (e.g., private browsing mode)
+		}
 	//}
 }
 /* 
@@ -137,6 +151,10 @@ function reOpenAdminNav() {
 	SetDisplay('AdminNavHeadClosed','none');
 	SetDisplay('AdminNavContentClosed','none');
 	navBindNodes();
-	cj.ajax.setVisitProperty('','AdminNavOpen','1')
+	try {
+		localStorage.setItem('AdminNavOpen', '1');
+	} catch(e) {
+		// Ignore localStorage errors (e.g., private browsing mode)
+	}
 }
 

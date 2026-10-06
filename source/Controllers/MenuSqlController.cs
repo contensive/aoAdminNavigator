@@ -95,9 +95,13 @@ namespace Contensive.AdminNavigator {
                             result += "," + ContentID.ToString();
                             string contentName = cp.Content.GetRecordName("content", ContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                string ChildIDList = cp.Content.GetProperty(contentName, "ChildIDList");
-                                if (!string.IsNullOrEmpty(ChildIDList)) {
-                                    result += "," + ChildIDList;
+                                using (var csContent = cp.CSNew()) {
+                                    if (csContent.Open(contentName, $"id={ContentID}")) {
+                                        string ChildIDList = csContent.GetText("ChildIDList");
+                                        if (!string.IsNullOrEmpty(ChildIDList)) {
+                                            result += "," + ChildIDList;
+                                        }
+                                    }
                                 }
                             }
                             cs.GoNext();
@@ -112,7 +116,7 @@ namespace Contensive.AdminNavigator {
                 // 
                 return result;
             } catch (Exception ex) {
-                cp.Site.ErrorReport("");
+                cp.Site.ErrorReport(ex);
                 throw;
             }
         }

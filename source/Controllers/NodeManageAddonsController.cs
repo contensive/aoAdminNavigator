@@ -26,8 +26,6 @@ namespace Contensive.AdminNavigator {
                 // criteria &= "and((blockNavigatorNode=0)or(blockNavigatorNode is null))"
                 // End If
                 using (var cs3 = cp.CSNew()) {
-                    var NodeType = common.NodeTypeEnum.NodeTypeCollection;
-                    bool BlockSubNodes = false;
                     if (cs3.Open("Add-on Collections", criteria, "name", true, fieldList, 9999, 1)) {
                         do {
                             string Name = cs3.GetText("name").Trim();
