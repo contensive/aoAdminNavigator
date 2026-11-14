@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$CollectionName,
@@ -7,7 +7,9 @@ param(
     [string]$UiPath = '',
     [string]$TargetDomain = 'www.contensive.com'
 )
+
 $ErrorActionPreference = 'Stop'
+
 Import-Module (Join-Path $PSScriptRoot '..\..\Contensive5\scripts\deploy-to-addon-library.psm1') -Force
 Invoke-AddonLibraryDeploy `
     -CollectionName $CollectionName `
